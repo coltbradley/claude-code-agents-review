@@ -416,21 +416,20 @@ git diff
 
 ## Uninstall
 
-To remove the agents from your project:
-
 ```bash
-# Remove agent definitions
-rm -rf .claude/agents/
+# Option A: One-liner (recommended)
+curl -s https://raw.githubusercontent.com/undeadlist/claude-code-agents/main/uninstall.sh | bash
 
-# Remove generated audit reports
-rm -rf .claude/audits/
-
-# Remove workflows
-rm -rf workflows/
-
-# Optionally remove CLAUDE.md if you created one
-rm CLAUDE.md
+# Option B: Manual removal
+rm -rf .claude/agents/ .claude/audits/ workflows/
 ```
+
+This removes:
+- `.claude/agents/` - agent prompt definitions
+- `.claude/audits/` - generated reports (gitignored)
+- `workflows/` - predefined workflow chains
+
+> **Note:** CLAUDE.md is left in place. Remove manually if desired.
 
 ---
 
