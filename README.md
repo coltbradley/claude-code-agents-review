@@ -97,10 +97,14 @@ claude-code-agents/
 Install once, use across all projects. No per-project file copying needed.
 
 ```bash
-# In Claude Code:
+# Step 1: Add the marketplace (run inside Claude Code)
 /plugin marketplace add undeadlist/claude-code-agents
-/plugin install claude-code-agents@community
+
+# Step 2: Install (run in your terminal)
+claude plugin install claude-code-agents@undeadlist-claude-code-agents
 ```
+
+Or browse and install via the `/plugin` UI → **Discover** tab after Step 1.
 
 All 24 agents and 6 workflow skills become natively available. Use skills like `/full-audit`, `/pre-commit`, `/pre-deploy`, etc.
 

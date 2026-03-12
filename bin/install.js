@@ -67,9 +67,9 @@ function install() {
 
     console.log('\n  Claude Code Agents v3.0\n');
     console.log('  Installing 24 agents + 6 workflows\n');
-    console.log('  Tip: Install as a plugin instead for automatic updates:');
+    console.log('  Tip: Install as a plugin instead (once, works across all projects):');
     console.log('    /plugin marketplace add undeadlist/claude-code-agents');
-    console.log('    /plugin install claude-code-agents@community\n');
+    console.log('    claude plugin install claude-code-agents@undeadlist-claude-code-agents\n');
 
     let agentsInstalled = 0;
     let agentsSkipped = 0;
