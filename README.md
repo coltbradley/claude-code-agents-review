@@ -2,12 +2,14 @@
 
 [![Claude Code Ready](badges/claude-code-ready.svg)](https://undeadlist.com)
 
-## For Solo Dev Startups Using Claude Code Agents
+## For Solo Dev Startups Building with Next.js + Claude Code
 
 ![Parallel Audit Demo](./assets/terminal-demo.svg)
 
 > **Target User:** Solo dev running a startup, only engineer, entire company.
 > **Goal:** Pull this repo into any project and have a full agent team ready to go.
+> **Designed for:** Next.js / React / TypeScript full-stack web apps (Prisma, npm/pnpm, Vercel).
+> Other stacks can adapt the agent prompts, but examples and tooling defaults target this stack.
 > **Built by:** Paul @ UndeadList — learned the hard way what works.
 
 ---
@@ -124,6 +126,22 @@ npx claude-code-agents
 ```
 
 This copies agents into your project's `.claude/agents/` directory.
+
+---
+
+## Stack Compatibility
+
+These agents are optimized for **Next.js / React / TypeScript** projects using **Prisma**, **npm/pnpm**, and **Vercel**. Commands, file paths, and examples throughout the agent prompts reflect this stack.
+
+**Stack-agnostic agents** (useful for any project):
+- `security-auditor` — OWASP checks apply to any web app
+- `code-auditor` — quality principles are language-agnostic
+- `doc-auditor` — documentation gap analysis works everywhere
+- `pr-writer` — generates PR descriptions for any git repo
+- `fix-planner` — prioritization logic is framework-independent
+- `architect-reviewer` — review criteria are generic
+
+**Adapting for other stacks:** Fork the repo and edit the agent `.md` files in `agents/`. Swap Next.js-specific commands (`npm run dev`, `pnpm tsc`, `localhost:3000`) for your equivalents. The orchestration structure works regardless of stack — only the tool-specific examples need changing.
 
 ---
 
