@@ -28,8 +28,8 @@ Compare the code against the scope of work or requirements doc. Report:
 ## Phase 4: Full Audit
 
 Dispatch all 9 auditors in parallel using the Agent tool:
-`security-auditor`, `performance-auditor`, `reliability-auditor`, `maintainability-auditor`,
-`testing-auditor`, `documentation-auditor`, `architecture-auditor`, `dependency-auditor`, `api-auditor`
+`security-auditor`, `bug-auditor`, `code-quality-auditor`, `dependency-auditor`,
+`documentation-auditor`, `infrastructure-auditor`, `performance-auditor`, `database-auditor`, `api-auditor`
 
 Wait for all to complete, then dispatch `fix-planner` with their combined findings.
 
