@@ -134,55 +134,52 @@ meaning broken code can be deployed automatically."
 **Plain English:** What this means in everyday terms. No jargon.
 **Business Impact:** What goes wrong if this is not fixed (outage, data exposure,
 failed deployment, compliance issue).
-**Severity:** Critical | High | Medium | Low
+**Severity:** Critical | Important | Minor
 **Technical Detail:** File name, line number, specific setting or pattern found.
 **Fix:** Exact change to make (config line, command, or setting to add/remove).
 
 ### INFRA-002: Debug Mode Enabled in Production Config
 **Plain English:** Detailed internal error messages are visible to the public. Attackers can use these to map your system.
 **Business Impact:** Information leakage, compliance risk.
-**Severity:** High
+**Severity:** Important
 **Technical Detail:** File and line where DEBUG=true or equivalent is set.
 **Fix:** Set DEBUG=false and read it from an environment variable.
 
 ### INFRA-003: No Health Check Configured
 **Plain English:** Your hosting platform cannot detect if the app crashes. Outages go undetected and unrecovered.
 **Business Impact:** Extended downtime, no automatic recovery.
-**Severity:** Medium
+**Severity:** Minor
 **Technical Detail:** No HEALTHCHECK in Dockerfile, no /health endpoint in config.
 **Fix:** Add a HEALTHCHECK to Dockerfile or configure one in your platform's deployment config.
 
 ### INFRA-004: CORS Allows All Origins
 **Plain English:** Any website can make requests to your app on behalf of your users — equivalent to an unlocked front door.
 **Business Impact:** Data theft, unauthorized API usage.
-**Severity:** High
+**Severity:** Important
 **Technical Detail:** `Access-Control-Allow-Origin: *` found in config.
 **Fix:** Replace `*` with the specific domain(s) that should be allowed.
 
 ### INFRA-005: Container Running as Root
 **Plain English:** Your app runs with full administrator privileges. A breach gives attackers maximum access.
 **Business Impact:** Security breach escalation risk.
-**Severity:** High
+**Severity:** Important
 **Technical Detail:** No `USER` directive in Dockerfile.
 **Fix:** Add `USER nonroot` (or equivalent) before the final CMD.
 
 ### INFRA-006: No CI/CD Pipeline Found
 **Plain English:** Broken code can be deployed with no automated safety check. Every deployment is a manual risk.
 **Business Impact:** Higher outage risk, slower and more fragile releases.
-**Severity:** Medium
+**Severity:** Minor
 **Technical Detail:** No workflow files found in .github/workflows/, .gitlab-ci.yml, etc.
 **Fix:** Add a basic CI pipeline that runs tests on every push.
 
 ## Recommendations
 
 ### Must Fix Before Launch
-- [ ] [Critical and High findings]
+- [ ] [Critical and Important findings]
 
-### Improve Before Scaling
-- [ ] [Medium findings]
-
-### Best Practice Hardening
-- [ ] [Low findings]
+### Improve When Time Allows
+- [ ] [Minor findings]
 ```
 
 ## Execution Logging

@@ -149,7 +149,7 @@ unavailable, recovering productivity would take weeks."
 ### DOC-001: [Finding Title]
 **Plain English:** What is missing and why it matters in everyday terms.
 **Business Impact:** Onboarding time, key-person risk, wasted debugging hours.
-**Severity:** Critical | High | Medium | Low
+**Severity:** Critical | Important | Minor
 **Technical Detail:** Specific files, line counts, what was checked.
 **Recommendation:** Exactly what to write or create to fix this.
 
@@ -157,7 +157,7 @@ unavailable, recovering productivity would take weeks."
 **Plain English:** The codebase has [N] unresolved notes left by the developer
 marking things that are broken, unfinished, or held together with duct tape.
 **Business Impact:** Unknown technical debt, hidden instability.
-**Severity:** Medium
+**Severity:** Minor
 **Technical Detail:** Count by type (TODO: X, FIXME: X, HACK: X). Sample locations.
 **Recommendation:** Triage each one — fix, schedule, or remove.
 
@@ -166,20 +166,17 @@ marking things that are broken, unfinished, or held together with duct tape.
 systems call, but there is no documentation explaining what they do or how to
 use them.
 **Business Impact:** Integration work requires reverse-engineering the code.
-**Severity:** High
+**Severity:** Important
 **Technical Detail:** Files containing route definitions with no accompanying docs.
 **Recommendation:** Add OpenAPI/Swagger spec or inline docstrings.
 
 ## Recommendations
 
-### Address Immediately (Critical to Business Continuity)
-- [ ] [Finding with the highest bus factor impact]
+### Must Fix (Critical to Business Continuity)
+- [ ] [Critical and Important findings]
 
-### High Priority
-- [ ] [Findings that significantly raise onboarding cost]
-
-### Ongoing Hygiene
-- [ ] [Low-severity items like TODO cleanup]
+### Fix When Time Allows
+- [ ] [Minor findings like TODO cleanup]
 ```
 
 ## Execution Logging

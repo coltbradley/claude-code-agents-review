@@ -116,7 +116,7 @@ cost of (larger app, slower loads) but never actually using."
 ### DEP-001: [Vulnerability Name] — [Package]
 **Plain English:** What this means to a non-programmer and why it matters.
 **Business Impact:** Data breach risk / compliance issue / downtime risk.
-**Severity:** Critical | High | Medium | Low
+**Severity:** Critical | Important | Minor
 **Technical Detail:** CVE ID, affected version, fixed version, location.
 **Fix:** Exact command to run (e.g. `npm update express`).
 
@@ -124,7 +124,7 @@ cost of (larger app, slower loads) but never actually using."
 **Plain English:** This library is running an old version, like using a phone
 that hasn't received security updates in two years.
 **Business Impact:** Missing security patches, incompatibility risk.
-**Severity:** Medium
+**Severity:** Minor
 **Technical Detail:** Current version, latest version, changelog link if known.
 **Fix:** Command to update.
 
@@ -132,7 +132,7 @@ that hasn't received security updates in two years.
 **Plain English:** Your project lists this library as a requirement but never
 actually uses it. It adds weight and attack surface for no benefit.
 **Business Impact:** Slower installs, larger deployments, unnecessary risk.
-**Severity:** Low
+**Severity:** Minor
 **Technical Detail:** Package name, where it appears in manifest, no import found.
 **Fix:** Remove from manifest.
 
@@ -140,7 +140,7 @@ actually uses it. It adds weight and attack surface for no benefit.
 **Plain English:** One of your libraries has a license that may require you to
 make your entire codebase public. This is a legal issue, not just a tech issue.
 **Business Impact:** Legal / IP risk for commercial products.
-**Severity:** High
+**Severity:** Important
 **Technical Detail:** Package name, license type (GPL/AGPL), conflicting use.
 **Fix:** Replace with a permissively-licensed alternative.
 
@@ -148,20 +148,17 @@ make your entire codebase public. This is a legal issue, not just a tech issue.
 **Plain English:** This package was published very recently and has very few
 users. Using brand-new, unvetted software carries risk.
 **Business Impact:** Potential for malicious code, instability.
-**Severity:** Medium
+**Severity:** Minor
 **Technical Detail:** Package name, publish date, download count, maintainer count.
 **Fix:** Evaluate need; prefer established alternatives.
 
 ## Recommendations
 
 ### Must Fix Before Launch
-- [ ] [List critical/high severity vulnerabilities with fix commands]
+- [ ] [List Critical and Important findings with fix commands]
 
-### Fix Soon
-- [ ] [List medium findings]
-
-### Clean Up When Convenient
-- [ ] [List low findings — unused deps, minor outdated packages]
+### Fix When Time Allows
+- [ ] [List Minor findings — unused deps, minor outdated packages]
 ```
 
 ## Execution Logging
