@@ -1,26 +1,16 @@
 {
-  "name": "claude-code-agents",
-  "version": "3.0.0",
-  "description": "24 parallel audit agents + 6 workflow skills for Claude Code. Complete E2E development workflow for solo devs.",
+  "name": "code-guardian",
+  "version": "1.0.0",
+  "description": "Code-agnostic guardrails for non-programmers building with AI tools. 9 specialist auditors + 8 workflow skills that report in plain English.",
   "author": {
-    "name": "UndeadList",
-    "email": "hello@undeadlist.com",
-    "url": "https://undeadlist.com"
+    "name": "Colt Bradley",
+    "url": "https://github.com/coltbradley"
   },
   "license": "MIT",
-  "repository": "https://github.com/undeadlist/claude-code-agents",
-  "homepage": "https://github.com/undeadlist/claude-code-agents#readme",
-  "keywords": [
-    "audit",
-    "security",
-    "code-quality",
-    "testing",
-    "browser-qa",
-    "deployment",
-    "workflows",
-    "solo-dev"
-  ],
+  "repository": "https://github.com/coltbradley/code-guardian",
+  "keywords": ["audit", "code-review", "non-programmer", "vibe-coding", "guardrails", "security"],
   "agents": "agents/",
   "skills": "skills/",
+  "hooks": "hooks/hooks.json",
   "minClaudeCodeVersion": "1.0.0"
 }
