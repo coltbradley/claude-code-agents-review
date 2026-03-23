@@ -7,8 +7,7 @@
       "description": "Code-agnostic guardrails for non-programmers building with AI tools",
       "source": {
         "source": "url",
-        "url": "https://github.com/coltbradley/claude-code-agents-review.git",
-        "sha": "6f3d2944c30002ff26b196f1bf7168fd72cb3aa2"
+        "url": "https://github.com/coltbradley/claude-code-agents-review.git"
       }
     }
   ]
