@@ -17,15 +17,15 @@ Code Guardian is a code-agnostic guardrails plugin for non-programmers building 
 
 | Agent | Scope | Report |
 |---|---|---|
-| security-auditor | Credentials, injection risks, auth flaws, exposed secrets | `.claude/audits/security.md` |
-| bug-auditor | Logic errors, null handling, edge cases, silent failures | `.claude/audits/bugs.md` |
-| code-quality-auditor | Maintainability, duplication, naming, structure | `.claude/audits/code-quality.md` |
-| dependency-auditor | Outdated packages, known CVEs, license risks | `.claude/audits/dependencies.md` |
-| documentation-auditor | Missing docs, misleading comments, undocumented behavior | `.claude/audits/documentation.md` |
-| infrastructure-auditor | CI/CD config, environment handling, deployment risks | `.claude/audits/infrastructure.md` |
-| performance-auditor | Slow queries, memory leaks, blocking calls, inefficiencies | `.claude/audits/performance.md` |
-| database-auditor | Schema risks, missing indexes, migration safety, data loss | `.claude/audits/database.md` |
-| api-auditor | Endpoint security, input validation, error exposure, rate limiting | `.claude/audits/api.md` |
+| security-auditor | Credentials, injection risks, auth flaws, exposed secrets | `AUDIT_SECURITY.md` |
+| bug-auditor | Logic errors, null handling, edge cases, silent failures | `AUDIT_BUGS.md` |
+| code-quality-auditor | Maintainability, duplication, naming, structure | `AUDIT_CODE_QUALITY.md` |
+| dependency-auditor | Outdated packages, known CVEs, license risks | `AUDIT_DEPENDENCIES.md` |
+| documentation-auditor | Missing docs, misleading comments, undocumented behavior | `AUDIT_DOCUMENTATION.md` |
+| infrastructure-auditor | CI/CD config, environment handling, deployment risks | `AUDIT_INFRASTRUCTURE.md` |
+| performance-auditor | Slow queries, memory leaks, blocking calls, inefficiencies | `AUDIT_PERFORMANCE.md` |
+| database-auditor | Schema risks, missing indexes, migration safety, data loss | `AUDIT_DATABASE.md` |
+| api-auditor | Endpoint security, input validation, error exposure, rate limiting | `AUDIT_API.md` |
 
 ### Action Agents (3)
 
@@ -67,17 +67,20 @@ All output is written to `.claude/audits/`:
 
 ```
 .claude/audits/
-  security.md
-  bugs.md
-  code-quality.md
-  dependencies.md
-  documentation.md
-  infrastructure.md
-  performance.md
-  database.md
-  api.md
-  health-report.md
-  fix-plan.md
+  AUDIT_SECURITY.md
+  AUDIT_BUGS.md
+  AUDIT_CODE_QUALITY.md
+  AUDIT_DEPENDENCIES.md
+  AUDIT_DOCUMENTATION.md
+  AUDIT_INFRASTRUCTURE.md
+  AUDIT_PERFORMANCE.md
+  AUDIT_DATABASE.md
+  AUDIT_API.md
+  FIXES.md
+  TEST_REPORT.md
+  HEALTH_REPORT.md
+  TREND_REPORT.md
+  snapshots/YYYY-MM-DD/
 ```
 
 ## Hooks (Automatic)
