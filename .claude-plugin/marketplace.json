@@ -4,9 +4,12 @@
   "plugins": [
     {
       "name": "code-guardian",
-      "source": ".",
       "description": "Code-agnostic guardrails for non-programmers building with AI tools",
-      "version": "1.0.0"
+      "source": {
+        "source": "url",
+        "url": "https://github.com/coltbradley/claude-code-agents-review.git",
+        "sha": "15eff783916168bce5396061e073bc7ac731df0d"
+      }
     }
   ]
 }
