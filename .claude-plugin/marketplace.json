@@ -1,0 +1,9 @@
+{
+  "marketplace": "community",
+  "category": "code-quality",
+  "tags": ["audit", "code-review", "non-programmer", "vibe-coding", "guardrails", "security"],
+  "pricing": "free",
+  "changelog": {
+    "1.0.0": "Initial release — 12 agents, 8 skills, automated hooks"
+  }
+}

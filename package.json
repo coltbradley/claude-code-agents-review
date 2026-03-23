@@ -1,42 +1,18 @@
 {
-  "name": "claude-code-agents",
-  "version": "3.0.0",
-  "description": "Claude Code plugin: 24 parallel audit agents + 6 workflow skills - complete E2E development workflow",
-  "keywords": [
-    "claude",
-    "claude-code",
-    "anthropic",
-    "ai-agents",
-    "code-audit",
-    "security-audit",
-    "subagents",
-    "parallel-execution",
-    "browser-qa",
-    "deployment",
-    "testing",
-    "workflows"
-  ],
-  "author": "UndeadList <hello@undeadlist.com>",
+  "name": "code-guardian",
+  "version": "1.0.0",
+  "description": "Code-agnostic guardrails for non-programmers building with AI tools",
+  "keywords": ["claude", "claude-code", "audit", "code-review", "non-programmer", "vibe-coding", "guardrails"],
+  "author": "Colt Bradley",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/undeadlist/claude-code-agents.git"
-  },
-  "homepage": "https://github.com/undeadlist/claude-code-agents#readme",
-  "bugs": {
-    "url": "https://github.com/undeadlist/claude-code-agents/issues"
-  },
-  "bin": {
-    "claude-code-agents": "./bin/install.js"
+    "url": "git+https://github.com/coltbradley/code-guardian.git"
   },
   "files": [
-    "bin/",
     "agents/",
     "skills/",
-    "workflows/",
+    "hooks/",
     ".claude-plugin/"
-  ],
-  "engines": {
-    "node": ">=14"
-  }
+  ]
 }
