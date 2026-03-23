@@ -1,0 +1,14 @@
+{
+  "name": "coltbradley-plugins",
+  "owner": {
+    "name": "Colt Bradley"
+  },
+  "plugins": [
+    {
+      "name": "code-guardian",
+      "source": ".",
+      "description": "Code-agnostic guardrails for non-programmers building with AI tools",
+      "version": "1.0.0"
+    }
+  ]
+}
