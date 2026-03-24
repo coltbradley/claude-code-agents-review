@@ -88,7 +88,7 @@ All output is written to `.claude/audits/`:
 These run without being asked:
 
 - **pre-commit** — scans staged files for secrets and credentials, blocks `.env` files from being committed, warns if any single file exceeds 500 lines
-- **post-edit** — nudges when a single change touches more than 10 files, suggesting a checkpoint audit
+- **post-edit** — nudges when a single change touches 5 or more files, suggesting a checkpoint audit
 
 ## Superpowers Integration
 

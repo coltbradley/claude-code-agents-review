@@ -1,3 +1,9 @@
 # Audit outputs - generated files
 .claude/audits/
 .claude/settings.local.json
+
+# Environment files (allow examples/templates)
+.env*
+!.env.example
+!.env.template
+!.env.sample

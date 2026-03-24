@@ -61,12 +61,12 @@ Each auditor runs independently and in parallel during a full audit.
 |-------|---------------|-------------|
 | `security-auditor` | Exposed secrets, injection risks, auth gaps, OWASP top 10 | `AUDIT_SECURITY.md` |
 | `bug-auditor` | Runtime errors, null references, logic gaps, unhandled edge cases | `AUDIT_BUGS.md` |
-| `code-auditor` | Complexity, duplication, dead code, readability | `AUDIT_CODE.md` |
-| `dep-auditor` | Outdated packages, known CVEs, license risks | `AUDIT_DEPS.md` |
-| `doc-auditor` | Missing docs, misleading comments, undocumented public APIs | `AUDIT_DOCS.md` |
-| `infra-auditor` | Config files, env var usage, HTTP headers, secrets management | `AUDIT_INFRA.md` |
-| `perf-auditor` | Slow queries, unnecessary work, memory leaks, bundle size | `AUDIT_PERF.md` |
-| `db-auditor` | N+1 queries, missing indexes, unsafe migrations, data integrity | `AUDIT_DB.md` |
+| `code-quality-auditor` | Complexity, duplication, dead code, readability | `AUDIT_CODE_QUALITY.md` |
+| `dependency-auditor` | Outdated packages, known CVEs, license risks | `AUDIT_DEPENDENCIES.md` |
+| `documentation-auditor` | Missing docs, misleading comments, undocumented public APIs | `AUDIT_DOCUMENTATION.md` |
+| `infrastructure-auditor` | Config files, env var usage, HTTP headers, secrets management | `AUDIT_INFRASTRUCTURE.md` |
+| `performance-auditor` | Slow queries, unnecessary work, memory leaks, bundle size | `AUDIT_PERFORMANCE.md` |
+| `database-auditor` | N+1 queries, missing indexes, unsafe migrations, data integrity | `AUDIT_DATABASE.md` |
 | `api-auditor` | Endpoint design, error handling, rate limiting, input validation | `AUDIT_API.md` |
 
 ### Action Agents (3)
@@ -110,7 +110,7 @@ These run without you asking:
 | Secret detection | Pre-commit | Scans staged files for API keys, tokens, passwords — **blocks commit** if found |
 | `.env` protection | Pre-commit | Prevents accidental commit of `.env` files — **blocks commit** |
 | Large file warning | Pre-commit | Warns when a file exceeds 500KB — **blocks commit** until confirmed |
-| Change size nudge | Post-edit | Advisory reminder when a single change touches more than 20 files |
+| Change size nudge | Post-edit | Advisory reminder when a single change touches 5 or more files |
 
 ---
 
