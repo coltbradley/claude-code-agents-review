@@ -8,17 +8,22 @@ Code Guardian is a Claude Code plugin that gives you a team of adversarial audit
 
 ## Installation
 
-**1. Marketplace:**
+**From GitHub:**
 ```
-/plugin install code-guardian@marketplace-name
+claude plugin install github:coltbradley/code-guardian
 ```
 
-**2. Local development:**
+**Update to latest:**
+```
+claude plugin update code-guardian
+```
+
+**Local development:**
 ```bash
-claude --plugin-dir ./code-guardian
+claude --plugin-dir /path/to/code-guardian
 ```
 
-**3. Reload after changes:**
+**Reload after local changes:**
 ```
 /reload-plugins
 ```

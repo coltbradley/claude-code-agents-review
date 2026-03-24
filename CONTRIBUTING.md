@@ -29,7 +29,7 @@ When releasing a new version, update the `version` field in both `package.json` 
 1. Clone the repo and make your changes
 2. Point Claude Code at your local copy:
    ```bash
-   claude --plugin-dir /path/to/claude-code-agents-review
+   claude --plugin-dir /path/to/code-guardian
    ```
 3. Test hook scripts directly:
    ```bash
