@@ -8,9 +8,10 @@ Code Guardian is a Claude Code plugin that gives you a team of adversarial audit
 
 ## Installation
 
-**From GitHub:**
+**From GitHub (two steps):**
 ```
-claude plugin install github:coltbradley/code-guardian
+/plugin marketplace add coltbradley/code-guardian
+/plugin install code-guardian@coltbradley-code-guardian
 ```
 
 **Update to latest:**
