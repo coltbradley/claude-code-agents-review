@@ -7,30 +7,25 @@ model: inherit
 
 # Performance Audit
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 Output to `.claude/audits/AUDIT_PERFORMANCE.md`. Never skips.
-
-## Audience
-
-Written for non-programmers building with AI. Every finding is explained in plain English with a business impact before any technical detail.
-
-## Language-Agnostic
-
-Patterns apply across JavaScript, TypeScript, Python, Go, Ruby, PHP, and Java. Adapt grep patterns to file extensions present in the project.
 
 ## Status Block
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md:
 ```yaml
 ---
 agent: performance-auditor
 status: COMPLETE | PARTIAL | ERROR
 timestamp: [ISO timestamp]
 duration: [seconds]
+findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-errors: []
 skipped_checks: []
+errors: []
 ---
 ```
 
@@ -51,12 +46,12 @@ skipped_checks: []
 - Large files and bundles (scripts, assets over reasonable thresholds)
 - Resource-heavy patterns (entire datasets loaded into memory, no pagination, no streaming)
 - Missing caching (repeated identical computations or API calls)
-- Database queries inside loops (from a performance angle)
 - Startup overhead (eager loading of modules or data that could be deferred)
 
 ## Not In Scope
 
 - Database schema design → database-auditor
+- Database query patterns → database-auditor
 - Code style or maintainability → code-quality-auditor
 - Security vulnerabilities → security-auditor
 
@@ -109,7 +104,7 @@ find . -not -path "*/node_modules/*" -not -path "*/.git/*" \
   ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
   ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" \
   \( -name "*.py" -o -name "*.js" -o -name "*.ts" \) \
-  | xargs wc -l 2>/dev/null | sort -rn | head -10
+  -print0 | xargs -0 wc -l 2>/dev/null | sort -rn | head -10
 ```
 
 ### 3. Resource-Heavy Patterns
@@ -152,16 +147,7 @@ grep -rEn "Cache-Control|ETag|max-age|memo|lru_cache|@cache\b" . \
 
 ### 5. Database Queries Inside Loops
 
-```bash
-# Awaited DB call inside map/loop (sequential, not batched)
-grep -rEn "for|forEach|\.map\b|\.each\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" \
-  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
-  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
-  --exclude-dir=vendor --exclude-dir=.git \
-  -A 5 | grep -E "await.*\.(find|get|query|select|filter|where)\b" | head -15
-```
+> N+1 and database-in-loop patterns are checked by the **database-auditor**. Do not duplicate this check here.
 
 ### 6. Startup Overhead
 
@@ -208,15 +194,3 @@ grep -rEn "^[a-zA-Z].*readFileSync|^[a-zA-Z].*execSync" . \
 ### Worth Considering
 - [ ] [Action] — [Reason]
 ```
-
-## Execution Logging
-
-Append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | performance-auditor | [status] | [duration] | critical=[X] important=[X] minor=[X] | [errors] |
-```
-
-## Output Verification
-
-1. Verify `.claude/audits/AUDIT_PERFORMANCE.md` was written with content beyond headers
-2. If no issues found, write "No performance issues detected" — never leave an empty file

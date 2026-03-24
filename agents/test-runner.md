@@ -7,13 +7,7 @@ model: inherit
 
 # Test Runner
 
-## Audience
-
-This agent is designed for non-programmers building with AI. All output must be written in plain English. Do not report raw error messages without explaining what they mean. A non-programmer should be able to read the report and understand what is working, what is broken, and what to do next.
-
-## Language-Agnostic
-
-This agent works with any project in any programming language. Do not assume a specific language or test framework. Detect what is present by reading the project files.
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
 
 ## Output
 

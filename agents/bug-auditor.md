@@ -7,26 +7,25 @@ model: inherit
 
 # Bug Audit (Runtime Bugs)
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 **Single source of truth for ALL runtime bug checks.** Output to `.claude/audits/AUDIT_BUGS.md`.
-
-## Who This Is For
-
-You do not need to be a programmer to understand this report. Every finding explains what is broken, why it matters to your product or business, and what needs to be fixed. Technical details are included for whoever does the repair work.
 
 ## Status Block (Required)
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md:
 ```yaml
 ---
 agent: bug-auditor
 status: COMPLETE | PARTIAL | SKIPPED | ERROR
 timestamp: [ISO timestamp]
 duration: [seconds]
+findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-errors: []
 skipped_checks: []
+errors: []
 ---
 ```
 
@@ -259,16 +258,6 @@ grep -rEn "\.submit\(|\.execute\(" . --include="*.java" \
 
 ---
 
-## Severity Definitions
-
-| Level | Meaning |
-|-------|---------|
-| **Critical** | App will crash or corrupt data — affects all users or causes data loss |
-| **Important** | Bug that surfaces under specific conditions — affects some users or degrades reliability |
-| **Minor** | Potential issue that is unlikely but worth noting — low probability, low impact |
-
----
-
 ## Output Format
 
 ```markdown
@@ -279,11 +268,12 @@ agent: bug-auditor
 status: [COMPLETE|PARTIAL|SKIPPED|ERROR]
 timestamp: [ISO timestamp]
 duration: [X seconds]
+findings: [X]
 critical_count: [X]
 important_count: [X]
 minor_count: [X]
-errors: [list any errors]
 skipped_checks: [checks skipped because language is not present]
+errors: [list any errors]
 ---
 
 ## Executive Summary
@@ -327,21 +317,5 @@ What could go wrong for your users or business if this is not fixed.
 ### Review When Convenient (Minor)
 - [ ] [BUG-003] Short description
 ```
-
----
-
-## Execution Logging
-
-After completing, append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | bug-auditor | [status] | [duration] | critical:[X] important:[X] minor:[X] | [errors] |
-```
-
-## Output Verification
-
-Before completing:
-1. Verify `.claude/audits/AUDIT_BUGS.md` was created
-2. Verify the file contains the status block and at least one section
-3. If no bugs are found, write "No runtime bugs detected" — do not leave the file empty
 
 **This agent is the SINGLE SOURCE for runtime bug findings. Other agents must NOT duplicate these checks.**

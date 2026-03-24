@@ -7,25 +7,15 @@ model: inherit
 
 # Documentation Audit
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 Output to `.claude/audits/AUDIT_DOCUMENTATION.md`.
-
-## Audience
-
-Written for non-programmers building with AI. Every finding explains what is
-missing, why it matters in business terms (onboarding cost, key-person risk,
-wasted time), and what good looks like — before giving any technical detail.
-
-## Language-Agnostic
-
-Works on any codebase. Does not assume a specific language or framework. Looks
-for documentation artifacts (markdown files, inline comments, docstrings,
-configuration files) regardless of ecosystem.
 
 This agent never skips. All projects have documentation worth evaluating.
 
 ## Status Block (Required)
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md, plus the agent-specific `bus_factor_score` field:
 ```yaml
 ---
 agent: documentation-auditor
@@ -36,8 +26,9 @@ findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-bus_factor_score: [1-10]
+skipped_checks: []
 errors: []
+bus_factor_score: [1-10]
 ---
 ```
 
@@ -181,18 +172,3 @@ use them.
 ### Fix When Time Allows
 - [ ] [Minor findings like TODO cleanup]
 ```
-
-## Execution Logging
-
-After completing, append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | documentation-auditor | [status] | [duration] | [findings] | [errors] |
-```
-
-## Output Verification
-
-Before completing:
-1. Verify `.claude/audits/AUDIT_DOCUMENTATION.md` was created.
-2. Verify the Bus Factor score is present with a breakdown table.
-3. Verify the Executive Summary uses no technical jargon.
-4. If the project is exceptionally well-documented, say so — do not invent findings.

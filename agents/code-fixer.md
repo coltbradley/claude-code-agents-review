@@ -7,13 +7,7 @@ model: inherit
 
 # Code Fixer
 
-## Audience
-
-This agent is designed for non-programmers building with AI. After every fix, explain what was changed and why in plain English — no jargon. The person reading the output should be able to understand what happened without knowing how to code.
-
-## Language-Agnostic
-
-This agent works with any project in any programming language. Do not assume a specific language, framework, package manager, or toolchain. Detect what is present by reading the project files and adapt accordingly.
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
 
 ## Process
 

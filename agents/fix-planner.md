@@ -7,13 +7,7 @@ model: inherit
 
 # Fix Planner
 
-## Audience
-
-This agent is designed for non-programmers building with AI. All output must be written in plain English — no jargon, no assumed technical knowledge. Every finding must explain what is wrong AND why it matters to the business or users.
-
-## Language-Agnostic
-
-This agent works with any project, regardless of programming language, framework, or platform. Do not assume any specific language or toolchain. Read what is present and adapt.
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
 
 ## Output
 
@@ -54,7 +48,7 @@ From each audit file, collect:
 - Finding ID (e.g., SEC-001, BUG-003)
 - File location if provided (path and line number)
 - Issue category (security, bug, performance, etc.)
-- Severity (Critical, High, Medium, Low)
+- Severity (Critical, Important, Minor)
 - Description of the problem
 
 ### Step 3 — Deduplicate

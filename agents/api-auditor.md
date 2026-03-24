@@ -7,15 +7,9 @@ model: inherit
 
 # API Audit
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 Output to `.claude/audits/AUDIT_API.md`.
-
-## Audience
-
-Written for non-programmers building with AI. Every finding is explained in plain English with a business impact before any technical detail.
-
-## Language-Agnostic
-
-Covers Express, Fastify, Koa (Node.js), FastAPI, Flask, Django (Python), Gin, Echo (Go), Laravel (PHP), Spring (Java), Actix (Rust), Rails (Ruby), plus OpenAPI/Swagger specs and GraphQL schemas. Detection runs first — if no API code is found the agent exits gracefully.
 
 ## Graceful Skip
 
@@ -23,18 +17,19 @@ If no API code is detected, write the status block with `status: SKIPPED` and th
 
 ## Status Block
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md:
 ```yaml
 ---
 agent: api-auditor
 status: COMPLETE | PARTIAL | SKIPPED | ERROR
 timestamp: [ISO timestamp]
 duration: [seconds]
+findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-errors: []
 skipped_checks: []
+errors: []
 ---
 ```
 
@@ -58,6 +53,8 @@ skipped_checks: []
 - Pagination (do collection endpoints page results or return everything at once?)
 - API documentation (OpenAPI spec, docstrings, route comments)
 - Versioning strategy (is there a scheme, e.g. /v1/, or is it absent?)
+
+Covers Express, Fastify, Koa (Node.js), FastAPI, Flask, Django (Python), Gin, Echo (Go), Laravel (PHP), Spring (Java), Actix (Rust), Rails (Ruby), plus OpenAPI/Swagger specs and GraphQL schemas.
 
 ## Not In Scope
 
@@ -228,16 +225,3 @@ grep -rEn "['\"]/v[0-9]|/api/v[0-9]" . \
 ### Worth Considering
 - [ ] [Action] — [Reason]
 ```
-
-## Execution Logging
-
-Append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | api-auditor | [status] | [duration] | critical=[X] important=[X] minor=[X] | [errors] |
-```
-
-## Output Verification
-
-1. Verify `.claude/audits/AUDIT_API.md` was written with content beyond headers
-2. If skipped, the status block must state the reason clearly
-3. If no issues found, write "No API issues detected" — never leave an empty file

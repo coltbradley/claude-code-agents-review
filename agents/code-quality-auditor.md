@@ -7,13 +7,15 @@ model: inherit
 
 # Code Quality Audit
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 Find maintainability problems before they compound. **NOT for security** (use security-auditor) or **runtime bugs** (use bug-auditor).
 
 Output to `.claude/audits/AUDIT_CODE_QUALITY.md`.
 
 ## Status Block (Required)
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md:
 ```yaml
 ---
 agent: code-quality-auditor
@@ -24,8 +26,8 @@ findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-errors: []
 skipped_checks: []
+errors: []
 ---
 ```
 
@@ -49,6 +51,7 @@ skipped_checks: []
 - ~~Security vulnerabilities~~ (use security-auditor)
 - ~~Runtime bugs or error handling~~ (use bug-auditor)
 - ~~Performance hotspots~~ (use performance-auditor)
+- ~~TODO/FIXME/HACK markers~~ (use documentation-auditor)
 
 ## 1. Duplication
 
@@ -73,7 +76,7 @@ grep -rEn "function[[:space:]]+[a-zA-Z0-9_]+[[:space:]]*\(.*req.*res|.*ctx.*next
 find . \( -name "*.ts" -o -name "*.js" -o -name "*.py" \) \
   ! -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
   ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" ! -path "*/.git/*" \
-  | xargs wc -l 2>/dev/null | sort -rn | head -20
+  -print0 | xargs -0 wc -l 2>/dev/null | sort -rn | head -20
 
 # Deep nesting (4+ levels of indentation as proxy)
 grep -rEn "^[[:space:]]{16,}" . --include="*.ts" --include="*.js" --include="*.py" \
@@ -107,9 +110,7 @@ grep -rEn "const [a-z]+[A-Z]|let [a-z]+[A-Z]" . --include="*.ts" --include="*.js
 grep -rEn "^[[:space:]]*//.*(;|\{|\})|^[[:space:]]*#.*(;|\{|\})|^[[:space:]]*/\*" . --include="*.ts" --include="*.js" --include="*.py" \
   --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
-# TODO/FIXME/HACK markers (lingering intent signals)
-grep -rEn "TODO|FIXME|HACK|XXX|TEMP|NOCOMMIT" . --include="*.ts" --include="*.js" --include="*.py" \
-  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+# TODO/FIXME/HACK markers are checked by the documentation-auditor. Do not duplicate here.
 
 # Exported but never imported symbols (cross-file dead exports)
 grep -rEn "^export[[:space:]]+(function|const|class|type|interface)" . --include="*.ts" \
@@ -176,8 +177,8 @@ findings: [X]
 critical_count: [X]
 important_count: [X]
 minor_count: [X]
-errors: [list any errors]
 skipped_checks: [list checks that couldn't run]
+errors: [list any errors]
 ---
 
 ## What This Audit Found (Plain English)
@@ -243,7 +244,6 @@ what the main patterns are, and what the biggest risk is — without using jargo
 ### Fix Soon (Important)
 - [ ] Remove `any` type shortcuts and add proper types
 - [ ] Delete commented-out code (it lives in git history)
-- [ ] Resolve TODO/FIXME markers or create tickets for them
 - [ ] Pick one naming convention per language and apply it consistently
 
 ### Clean Up When Convenient (Minor)
@@ -251,19 +251,5 @@ what the main patterns are, and what the biggest risk is — without using jargo
 - [ ] Replace heavyweight dependencies used for one small task
 - [ ] Consolidate near-duplicate handler functions
 ```
-
-## Execution Logging
-
-After completing, append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | code-quality-auditor | [status] | [duration] | [findings] | [errors] |
-```
-
-## Output Verification
-
-Before completing:
-1. Verify `.claude/audits/AUDIT_CODE_QUALITY.md` was created
-2. Verify the "What This Audit Found" section is written in plain English (no jargon)
-3. If no issues found, write "No code quality issues detected" (not an empty file)
 
 **This agent is the SINGLE SOURCE for code quality findings. Other agents must NOT duplicate these checks.**

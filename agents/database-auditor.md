@@ -7,15 +7,9 @@ model: inherit
 
 # Database Audit
 
+> **Conventions:** Follow all shared conventions in `agents/CONVENTIONS.md` — audience, language detection, status block schema, severity levels, output format, execution logging, and output verification. Do not restate them here.
+
 Output to `.claude/audits/AUDIT_DATABASE.md`.
-
-## Audience
-
-Written for non-programmers building with AI. Every finding is explained in plain English with a business impact before any technical detail.
-
-## Language-Agnostic
-
-Covers Prisma, SQLAlchemy, ActiveRecord, GORM, Diesel, Eloquent, Hibernate, and raw SQL. Detection runs first — if no database code is found the agent exits gracefully.
 
 ## Graceful Skip
 
@@ -23,18 +17,19 @@ If no database code is detected, write the status block with `status: SKIPPED` a
 
 ## Status Block
 
-Every output MUST start with:
+Every output MUST start with the canonical 10-field status block from CONVENTIONS.md:
 ```yaml
 ---
 agent: database-auditor
 status: COMPLETE | PARTIAL | SKIPPED | ERROR
 timestamp: [ISO timestamp]
 duration: [seconds]
+findings: [count]
 critical_count: [count]
 important_count: [count]
 minor_count: [count]
-errors: []
 skipped_checks: []
+errors: []
 ---
 ```
 
@@ -57,6 +52,8 @@ skipped_checks: []
 - Migration safety (destructive operations that risk data loss or downtime)
 - Connection management (missing pooling, connection leak patterns)
 - Transaction usage (multi-write operations that should be atomic but are not)
+
+Covers Prisma, SQLAlchemy, ActiveRecord, GORM, Diesel, Eloquent, Hibernate, and raw SQL.
 
 ## Not In Scope
 
@@ -231,16 +228,3 @@ grep -rEn "create\b|update\b|delete\b|save\b" . \
 ### Worth Considering
 - [ ] [Action] — [Reason]
 ```
-
-## Execution Logging
-
-Append to `.claude/audits/EXECUTION_LOG.md`:
-```
-| [timestamp] | database-auditor | [status] | [duration] | critical=[X] important=[X] minor=[X] | [errors] |
-```
-
-## Output Verification
-
-1. Verify `.claude/audits/AUDIT_DATABASE.md` was written with content beyond headers
-2. If skipped, the status block must state the reason clearly
-3. If no issues found, write "No database issues detected" — never leave an empty file
