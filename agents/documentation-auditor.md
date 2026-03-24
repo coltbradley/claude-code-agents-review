@@ -74,27 +74,27 @@ ls .env.example .env.sample 2>/dev/null
 **3. Inline Documentation**
 ```bash
 # Count undocumented functions/classes (language-agnostic heuristic)
-grep -rn "^def \|^function \|^class \|^func \|^pub fn " --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" . | wc -l
-grep -rn '"""' --include="*.py" . | wc -l
-grep -rn "\/\*\*" --include="*.js" --include="*.ts" . | wc -l
+grep -rEn "^def |^function |^class |^func |^pub fn " --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | wc -l
+grep -rn '"""' --include="*.py" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | wc -l
+grep -rn "\/\*\*" --include="*.js" --include="*.ts" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | wc -l
 ```
 
 **4. TODO / FIXME / HACK Counts**
 ```bash
-grep -rn "TODO\|FIXME\|HACK\|WORKAROUND\|XXX" --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" --include="*.go" --include="*.java" . | grep -v ".git" | head -40
+grep -rEn "TODO|FIXME|HACK|WORKAROUND|XXX" --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" --include="*.go" --include="*.java" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -40
 ```
 
 **5. API Documentation**
 ```bash
 # Check for OpenAPI / Swagger specs
 ls openapi.yaml openapi.json swagger.yaml swagger.json docs/api* 2>/dev/null
-grep -rn "@api\|@route\|@endpoint\|swagger\|openapi" . --include="*.py" --include="*.js" --include="*.ts" | head -10
+grep -rEn "@api|@route|@endpoint|swagger|openapi" . --include="*.py" --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 **6. Architecture and Decision Docs**
 ```bash
 ls docs/ ADR/ decisions/ architecture* ARCHITECTURE* 2>/dev/null
-grep -rn "decision\|architecture\|why we\|trade.off" docs/ 2>/dev/null | head -10
+grep -rEn "decision|architecture|why we|trade.off" docs/ 2>/dev/null | head -10
 ```
 
 **7. AI Project Check**

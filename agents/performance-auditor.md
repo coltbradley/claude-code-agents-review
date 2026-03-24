@@ -66,17 +66,26 @@ skipped_checks: []
 
 ```bash
 # Nested loops over collections (O(n²) risk)
-grep -rn "for.*for\|forEach.*forEach\|\.map.*\.map" . \
+grep -rEn "for.*for|forEach.*forEach|\.map.*\.map" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" --include="*.go" --include="*.php" | head -20
+  --include="*.rb" --include="*.go" --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Filter/find re-scanning full list inside a loop
-grep -rn "\.filter\b\|\.find\b\|\.include\b\|\.indexOf\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -15
+grep -rEn "\.filter\b|\.find\b|\.include\b|\.indexOf\b" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -15
 
 # Sorting inside a loop
-grep -rn "\.sort\b\|sorted(" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -10
+grep -rEn "\.sort\b|sorted\(" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 2. Large Files and Bundles
@@ -84,15 +93,21 @@ grep -rn "\.sort\b\|sorted(" . \
 ```bash
 # Files over 500KB
 find . -not -path "*/node_modules/*" -not -path "*/.git/*" \
+  ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
+  ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" \
   -type f -size +500k | head -20
 
 # Images over 200KB
-find . -not -path "*/node_modules/*" \
+find . -not -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" \
+  ! -path "*/__pycache__/*" ! -path "*/dist/*" ! -path "*/build/*" \
+  ! -path "*/vendor/*" \
   \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) \
   -size +200k | head -10
 
 # Largest source files by line count
 find . -not -path "*/node_modules/*" -not -path "*/.git/*" \
+  ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
+  ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" \
   \( -name "*.py" -o -name "*.js" -o -name "*.ts" \) \
   | xargs wc -l 2>/dev/null | sort -rn | head -10
 ```
@@ -101,44 +116,62 @@ find . -not -path "*/node_modules/*" -not -path "*/.git/*" \
 
 ```bash
 # Loading all records with no limit/pagination
-grep -rn "findAll\|\.all()\|SELECT \*\|getAll\|fetchAll\|\.objects\.all" . \
+grep -rEn "findAll|\.all\(\)|SELECT \*|getAll|fetchAll|\.objects\.all" . \
   --include="*.py" --include="*.rb" --include="*.js" \
-  --include="*.ts" --include="*.php" | head -20
+  --include="*.ts" --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Reading entire file into memory
-grep -rn "readFileSync\|read_file\|file_get_contents\|ioutil\.ReadFile" . \
+grep -rEn "readFileSync|read_file|file_get_contents|ioutil\.ReadFile" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.php" --include="*.go" | head -10
+  --include="*.php" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 4. Missing Caching
 
 ```bash
 # Repeated external HTTP calls with no cache layer
-grep -rn "fetch(\|axios\.\|requests\.get\|http\.get\b\|urllib" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -20
+grep -rEn "fetch\(|axios\.|requests\.get|http\.get\b|urllib" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Cache-related keywords absent from API response handlers
-grep -rn "Cache-Control\|ETag\|max-age\|memo\|lru_cache\|@cache\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -10
+grep -rEn "Cache-Control|ETag|max-age|memo|lru_cache|@cache\b" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 5. Database Queries Inside Loops
 
 ```bash
 # Awaited DB call inside map/loop (sequential, not batched)
-grep -rn "for\|forEach\|\.map\b\|\.each\b" . \
+grep -rEn "for|forEach|\.map\b|\.each\b" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" -A 5 \
-  | grep -E "await.*\.(find|get|query|select|filter|where)\b" | head -15
+  --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  -A 5 | grep -E "await.*\.(find|get|query|select|filter|where)\b" | head -15
 ```
 
 ### 6. Startup Overhead
 
 ```bash
 # Blocking operations at module top-level (not inside a function)
-grep -rn "^[a-zA-Z].*readFileSync\|^[a-zA-Z].*execSync" . \
-  --include="*.js" --include="*.ts" | head -10
+grep -rEn "^[a-zA-Z].*readFileSync|^[a-zA-Z].*execSync" . \
+  --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ## Output

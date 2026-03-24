@@ -69,14 +69,22 @@ skipped_checks: []
 Run these before checks. If all return empty, set `status: SKIPPED`.
 
 ```bash
-grep -rn "\.get(\|\.post(\|\.put(\|\.patch(\|\.delete(" . \
-  --include="*.js" --include="*.ts" | head -5
+grep -rEn "\.get\(|\.post\(|\.put\(|\.patch\(|\.delete\(" . \
+  --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -5
 
-grep -rn "@app\.route\|@router\.\|@.*Mapping\|Route::\|->get(\|resources\b\|gin\.\|echo\.\|http\.HandleFunc" . \
+grep -rEn "@app\.route|@router\.|@.*Mapping|Route::|->get\(|resources\b|gin\.|echo\.|http\.HandleFunc" . \
   --include="*.py" --include="*.java" --include="*.php" \
-  --include="*.rb" --include="*.go" | head -5
+  --include="*.rb" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -5
 
-find . -not -path "*/node_modules/*" \
+find . -not -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" \
+  ! -path "*/__pycache__/*" ! -path "*/dist/*" ! -path "*/build/*" \
+  ! -path "*/vendor/*" \
   \( -name "openapi.yaml" -o -name "openapi.json" \
      -o -name "swagger.yaml" -o -name "*.graphql" \) | head -5
 ```
@@ -89,70 +97,108 @@ find . -not -path "*/node_modules/*" \
 # All route paths — review for mixed naming conventions
 grep -rn "['\"]\/[a-zA-Z]" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" --include="*.go" | grep -v "node_modules" | head -30
+  --include="*.rb" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -30
 
 # GET used for destructive actions
-grep -rn "\.get(.*delete\|\.get(.*remove\|\.get(.*create" . \
-  --include="*.js" --include="*.ts" | head -10
+grep -rEn "\.get\(.*delete|\.get\(.*remove|\.get\(.*create" . \
+  --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 2. Input Validation
 
 ```bash
-grep -rn "req\.body\b\|request\.body\b\|request\.json\b\|c\.Bind\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" --include="*.go" | head -15
+grep -rEn "req\.body\b|request\.body\b|request\.json\b|c\.Bind\b" . \
+  --include="*.js" --include="*.ts" --include="*.py" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -15
 
-grep -rn "zod\|joi\|yup\|class-validator\|pydantic\|marshmallow\|validator\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -10
+grep -rEn "zod|joi|yup|class-validator|pydantic|marshmallow|validator\b" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
-grep -rn "parseInt\|Number(" . --include="*.js" --include="*.ts" \
-  | grep "req\.\|params\.\|body\.\|query\." | head -10
+grep -rEn "parseInt|Number\(" . --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -E "req\.|params\.|body\.|query\." | head -10
 ```
 
 ### 3. Error Responses
 
 ```bash
-grep -rn "res\.send.*error\|res\.json.*stack\|return.*error\.message\|return.*str(e)\|return.*traceback" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -15
+grep -rEn "res\.send.*error|res\.json.*stack|return.*error\.message|return.*str\(e\)|return.*traceback" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -15
 
-grep -rn "status(200)\|status_code=200\|StatusOK\b" . \
+grep -rEn "status\(200\)|status_code=200|StatusOK\b" . \
   --include="*.js" --include="*.ts" --include="*.py" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
   -A 2 | grep -i "error\|fail\|invalid" | head -10
 
-grep -rn "\"error\"\|\"message\"\|\"detail\"\|\"errors\"" . \
-  --include="*.js" --include="*.ts" --include="*.py" | head -15
+grep -rEn "\"error\"|\"message\"|\"detail\"|\"errors\"" . \
+  --include="*.js" --include="*.ts" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -15
 ```
 
 ### 4. Rate Limiting
 
 ```bash
-grep -rn "rateLimit\|rate-limit\|rate_limit\|throttle\b\|limiter\b\|slowDown\b" . \
+grep -rEn "rateLimit|rate-limit|rate_limit|throttle\b|limiter\b|slowDown\b" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.go" --include="*.rb" --include="*.php" | head -10
+  --include="*.go" --include="*.rb" --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
-grep -rn "login\|signin\|register\|signup\|password\b" . \
+grep -rEn "login|signin|register|signup|password\b" . \
   --include="*.js" --include="*.ts" --include="*.py" \
   --include="*.go" --include="*.rb" \
-  | grep -i "route\|endpoint\|path\|handler" | head -10
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -iE "route|endpoint|path|handler" | head -10
 ```
 
 ### 5. Pagination for Collections
 
 ```bash
-grep -rn "findMany\|findAll\|\.all()\|\.objects\.filter\|\.find({" . \
+grep -rEn "findMany|findAll|\.all\(\)|\.objects\.filter|\.find\(\{" . \
   --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" \
-  | grep -v "limit\|take\|skip\|offset\|page\b\|paginate\|cursor\b" | head -15
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -vE "limit|take|skip|offset|page\b|paginate|cursor\b" | head -15
 ```
 
 ### 6. Documentation and Versioning
 
 ```bash
-find . -not -path "*/node_modules/*" \
+find . -not -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" \
+  ! -path "*/__pycache__/*" ! -path "*/dist/*" ! -path "*/build/*" \
+  ! -path "*/vendor/*" \
   \( -name "openapi.yaml" -o -name "openapi.json" -o -name "swagger.yaml" \) | head -5
 
-grep -rn "['\"]\/v[0-9]\|\/api\/v[0-9]" . \
+grep -rEn "['\"]/v[0-9]|/api/v[0-9]" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.go" --include="*.rb" --include="*.php" | head -10
+  --include="*.go" --include="*.rb" --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ## Output

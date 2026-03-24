@@ -82,18 +82,18 @@ What to look for: API keys, passwords, tokens, or private keys written directly 
 
 ```bash
 # Common secret patterns across all languages
-grep -rn "sk-\|AKIA\|ghp_\|xox[baprs]-\|-----BEGIN" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --include="*.java" --include="*.php" --include="*.rs" | grep -v ".env" | head -20
+grep -rEn "sk-|AKIA|ghp_|xox[baprs]-|-----BEGIN" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --include="*.java" --include="*.php" --include="*.rs" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v ".env" | head -20
 
 # password/secret/key assignments (not references to env vars)
-grep -rn "password\s*=\s*['\"][^'\"]\|secret\s*=\s*['\"][^'\"]\|api_key\s*=\s*['\"][^'\"]" . --include="*.py" --include="*.go" --include="*.rb" | grep -v "os\.environ\|ENV\[" | head -20
+grep -rEn "password[[:space:]]*=[[:space:]]*['\"][^'\"]|secret[[:space:]]*=[[:space:]]*['\"][^'\"]|api_key[[:space:]]*=[[:space:]]*['\"][^'\"]" . --include="*.py" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "os\.environ\|ENV\[" | head -20
 
-grep -rn "password\s*[:=]\s*['\"][^'\"]" . --include="*.js" --include="*.ts" --include="*.java" --include="*.php" | grep -v "process\.env\|getenv\|config\." | head -20
+grep -rEn "password[[:space:]]*[:=][[:space:]]*['\"][^'\"]" . --include="*.js" --include="*.ts" --include="*.java" --include="*.php" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "process\.env\|getenv\|config\." | head -20
 
 # .env files accidentally committed
 ls -la .env .env.production .env.local 2>/dev/null
 
 # Private keys in any file
-grep -rn "BEGIN RSA PRIVATE\|BEGIN EC PRIVATE\|BEGIN OPENSSH PRIVATE" . | head -10
+grep -rEn "BEGIN RSA PRIVATE|BEGIN EC PRIVATE|BEGIN OPENSSH PRIVATE" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 Severity: **Critical** if a real-looking key value is present. **Important** if a placeholder or example value is present.
@@ -104,23 +104,23 @@ What to look for: User input inserted directly into database queries using strin
 
 ```bash
 # Python: f-strings or % formatting in SQL
-grep -rn "execute\s*(" . --include="*.py" | grep -E 'f"|%\s|\.format\(' | head -20
+grep -rEn "execute[[:space:]]*\(" . --include="*.py" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -E 'f"|%\s|\.format\(' | head -20
 
 # JavaScript/TypeScript: template literals in raw queries
-grep -rn "\`.*SELECT\|INSERT\|UPDATE\|DELETE.*\$\{" . --include="*.js" --include="*.ts" | head -20
-grep -rn "\$queryRaw\|\$executeRaw" . --include="*.ts" --include="*.js" | head -10
+grep -rEn "\`.*SELECT|INSERT|UPDATE|DELETE.*\$\{" . --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "\$queryRaw|\$executeRaw" . --include="*.ts" --include="*.js" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Go: Sprintf in queries
-grep -rn "Sprintf.*SELECT\|Sprintf.*WHERE\|Query(fmt\." . --include="*.go" | head -20
+grep -rEn "Sprintf.*SELECT|Sprintf.*WHERE|Query\(fmt\." . --include="*.go" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Java: concatenation in queries
-grep -rn "createQuery\|executeQuery\|prepareStatement" . --include="*.java" | grep '".*+' | head -20
+grep -rEn "createQuery|executeQuery|prepareStatement" . --include="*.java" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep '".*+' | head -20
 
 # PHP: query with variable interpolation
-grep -rn "mysqli_query\|pg_query\|\->query" . --include="*.php" | grep '\$' | head -20
+grep -rEn "mysqli_query|pg_query|-\>query" . --include="*.php" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep '\$' | head -20
 
 # Ruby: string interpolation in where/find
-grep -rn "\.where\s*(\s*\".*#\{" . --include="*.rb" | head -20
+grep -rEn "\.where[[:space:]]*\([[:space:]]*\".*#\{" . --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Critical** if user input reaches the query without sanitization.
@@ -131,22 +131,22 @@ What to look for: User input passed to shell commands or system functions.
 
 ```bash
 # Python
-grep -rn "os\.system\|os\.popen\|subprocess\.call\|subprocess\.run\|subprocess\.Popen" . --include="*.py" | grep -v "shell=False" | head -20
+grep -rEn "os\.system|os\.popen|subprocess\.call|subprocess\.run|subprocess\.Popen" . --include="*.py" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "shell=False" | head -20
 
 # JavaScript/TypeScript
-grep -rn "child_process\|exec(\|execSync\|spawn(" . --include="*.js" --include="*.ts" | head -20
+grep -rEn "child_process|exec\(|execSync|spawn\(" . --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Go
-grep -rn "exec\.Command\|os\/exec" . --include="*.go" | head -20
+grep -rEn "exec\.Command|os/exec" . --include="*.go" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Ruby
-grep -rn "system(\|exec(\|`\|IO\.popen\|Open3" . --include="*.rb" | head -20
+grep -rEn "system\(|exec\(|\`|IO\.popen|Open3" . --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Java
-grep -rn "Runtime\.exec\|ProcessBuilder" . --include="*.java" | head -20
+grep -rEn "Runtime\.exec|ProcessBuilder" . --include="*.java" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # PHP
-grep -rn "exec(\|system(\|passthru(\|shell_exec(\|popen(" . --include="*.php" | head -20
+grep -rEn "exec\(|system\(|passthru\(|shell_exec\(|popen\(" . --include="*.php" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Critical** if user-controlled input reaches the command.
@@ -157,19 +157,19 @@ What to look for: User-supplied content inserted into HTML without escaping, all
 
 ```bash
 # JavaScript/TypeScript/React
-grep -rn "dangerouslySetInnerHTML\|innerHTML\s*=" . --include="*.js" --include="*.ts" --include="*.tsx" --include="*.jsx" | head -20
+grep -rEn "dangerouslySetInnerHTML|innerHTML[[:space:]]*=" . --include="*.js" --include="*.ts" --include="*.tsx" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Python (Jinja2/Django templates bypassing auto-escape)
-grep -rn "| safe\|mark_safe\|Markup(" . --include="*.py" --include="*.html" | head -20
+grep -rEn "\| safe|mark_safe|Markup\(" . --include="*.py" --include="*.html" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Ruby (Rails raw/html_safe)
-grep -rn "\.html_safe\|raw(" . --include="*.rb" --include="*.erb" | head -20
+grep -rEn "\.html_safe|raw\(" . --include="*.rb" --include="*.erb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # PHP (echo without escaping)
-grep -rn "echo\s*\$_GET\|echo\s*\$_POST\|echo\s*\$_REQUEST" . --include="*.php" | head -20
+grep -rEn "echo[[:space:]]*\$_GET|echo[[:space:]]*\$_POST|echo[[:space:]]*\$_REQUEST" . --include="*.php" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Go (template/html bypass)
-grep -rn "template\.HTML\|template\.JS\|template\.URL" . --include="*.go" | head -20
+grep -rEn "template\.HTML|template\.JS|template\.URL" . --include="*.go" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Critical** if user input is the source. **Important** if the content is internal only.
@@ -180,16 +180,16 @@ What to look for: Routes with no login check, weak password storage, insecure se
 
 ```bash
 # Plaintext password storage (not hashed)
-grep -rn "password" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | grep -iv "hash\|bcrypt\|argon\|pbkdf\|scrypt\|verify" | grep -i "save\|insert\|store\|write" | head -20
+grep -rn "password" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -iv "hash\|bcrypt\|argon\|pbkdf\|scrypt\|verify" | grep -i "save\|insert\|store\|write" | head -20
 
 # Hardcoded credentials in auth logic
-grep -rn "admin\|password\|root" . --include="*.py" --include="*.js" --include="*.ts" | grep -E "==\s*['\"]|===\s*['\"]" | head -20
+grep -rEn "admin|password|root" . --include="*.py" --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -E "==[[:space:]]*['\"]|===[[:space:]]*['\"]" | head -20
 
 # JWT: none algorithm or missing verification
-grep -rn "algorithm.*none\|verify.*false\|options.*algorithms" . --include="*.py" --include="*.js" --include="*.ts" | head -10
+grep -rEn "algorithm.*none|verify.*false|options.*algorithms" . --include="*.py" --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Cookie flags
-grep -rn "set_cookie\|setCookie\|response\.cookie" . --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" | grep -v "httpOnly\|HttpOnly\|secure\|Secure" | head -20
+grep -rEn "set_cookie|setCookie|response\.cookie" . --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "httpOnly\|HttpOnly\|secure\|Secure" | head -20
 ```
 
 Severity: **Critical** for plaintext passwords or missing auth on sensitive routes. **Important** for insecure session cookies.
@@ -200,13 +200,13 @@ What to look for: Code that retrieves records by ID from user input without veri
 
 ```bash
 # Python/Django: object fetched by ID without ownership check
-grep -rn "get_object_or_404\|objects\.get(" . --include="*.py" | grep "pk\|id" | head -20
+grep -rEn "get_object_or_404|objects\.get\(" . --include="*.py" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep "pk\|id" | head -20
 
 # JavaScript/TypeScript: findById without user filter
-grep -rn "findById\|findOne\|findUnique\|findFirst" . --include="*.js" --include="*.ts" | grep -v "userId\|ownerId\|user_id\|owner_id" | head -20
+grep -rEn "findById|findOne|findUnique|findFirst" . --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "userId\|ownerId\|user_id\|owner_id" | head -20
 
 # Go: direct ID use from request params
-grep -rn "chi\.URLParam\|r\.PathValue\|mux\.Vars" . --include="*.go" | head -20
+grep -rEn "chi\.URLParam|r\.PathValue|mux\.Vars" . --include="*.go" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Critical** if any user can access any other user's data. **Important** if admin-only data could be exposed.
@@ -217,10 +217,10 @@ What to look for: Missing HTTP security headers that protect against clickjackin
 
 ```bash
 # Missing headers in framework config
-grep -rn "Content-Security-Policy\|X-Frame-Options\|X-Content-Type-Options\|Strict-Transport-Security" . | head -10
+grep -rEn "Content-Security-Policy|X-Frame-Options|X-Content-Type-Options|Strict-Transport-Security" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Overly permissive CORS
-grep -rn "Access-Control-Allow-Origin.*\*\|cors.*origin.*\*\|allow_origins.*\*" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | head -20
+grep -rEn "Access-Control-Allow-Origin.*\*|cors.*origin.*\*|allow_origins.*\*" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Important** for missing headers on public-facing apps. **Minor** if only used internally.
@@ -231,10 +231,10 @@ What to look for: State-changing endpoints (POST/PUT/DELETE) that do not validat
 
 ```bash
 # Forms or POST handlers without CSRF tokens
-grep -rn "csrf_exempt\|@csrf_exempt\|disable.*csrf\|skipCSRF" . --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" | head -20
+grep -rEn "csrf_exempt|@csrf_exempt|disable.*csrf|skipCSRF" . --include="*.py" --include="*.js" --include="*.ts" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Express without CSRF middleware
-grep -rn "app\.post\|router\.post" . --include="*.js" --include="*.ts" | head -20
+grep -rEn "app\.post|router\.post" . --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 Severity: **Important** for web apps. **Minor** for API-only services using token auth.
@@ -245,10 +245,10 @@ What to look for: Login, registration, password reset, and payment endpoints tha
 
 ```bash
 # Check for rate limiting middleware presence
-grep -rn "rateLimit\|rate_limit\|throttle\|RateLimiter\|slowDown" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | head -20
+grep -rEn "rateLimit|rate_limit|throttle|RateLimiter|slowDown" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Auth endpoints that may lack it
-grep -rn "login\|signin\|sign_in\|forgot.password\|reset.password\|register" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | grep -i "route\|handler\|endpoint\|def \|func " | head -20
+grep -rEn "login|signin|sign_in|forgot.password|reset.password|register" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "route\|handler\|endpoint\|def \|func " | head -20
 ```
 
 Severity: **Important** for login/auth endpoints with no limiting found.
@@ -259,13 +259,13 @@ What to look for: Sensitive fields (passwords, tokens, SSNs) returned in API res
 
 ```bash
 # Password or secret fields in API responses
-grep -rn "password\|secret\|token\|api_key\|ssn\|credit_card" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" | grep -i "json\|return\|response\|render\|serialize" | head -20
+grep -rEn "password|secret|token|api_key|ssn|credit_card" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "json\|return\|response\|render\|serialize" | head -20
 
 # PII written to logs
-grep -rn "print\|console\.log\|logger\.\|log\." . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | grep -i "email\|password\|ssn\|credit\|token" | head -20
+grep -rEn "print|console\.log|logger\.|log\." . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "email\|password\|ssn\|credit\|token" | head -20
 
 # Stack traces or internal paths in error responses
-grep -rn "traceback\|stackTrace\|stack_trace\|e\.stack" . --include="*.py" --include="*.js" --include="*.ts" | grep -i "response\|return\|render\|send" | head -20
+grep -rEn "traceback|stackTrace|stack_trace|e\.stack" . --include="*.py" --include="*.js" --include="*.ts" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "response\|return\|render\|send" | head -20
 ```
 
 Severity: **Critical** for passwords or tokens in responses. **Important** for PII in logs.
@@ -276,10 +276,10 @@ What to look for: Weak hash algorithms used for passwords or sensitive data; pre
 
 ```bash
 # Weak hash algorithms for passwords
-grep -rn "md5\|sha1\|sha256" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" | grep -i "password\|passwd\|hash" | head -20
+grep -rEn "md5|sha1|sha256" . --include="*.py" --include="*.js" --include="*.ts" --include="*.go" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "password\|passwd\|hash" | head -20
 
 # Insecure random for tokens/keys
-grep -rn "Math\.random\|random\.random()\|rand(" . --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" | grep -i "token\|key\|secret\|session\|nonce" | head -20
+grep -rEn "Math\.random|random\.random\(\)|rand\(" . --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "token\|key\|secret\|session\|nonce" | head -20
 ```
 
 Severity: **Critical** for MD5/SHA1 on passwords. **Important** for non-cryptographic random used in security contexts.

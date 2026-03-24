@@ -54,7 +54,9 @@ Before running checks, identify the language(s) present and skip checks that do 
 ```bash
 find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.go" \
   -o -name "*.rb" -o -name "*.java" -o -name "*.php" -o -name "*.rs" \) \
-  ! -path "*/node_modules/*" ! -path "*/.git/*" | sed 's/.*\.//' | sort | uniq -c | sort -rn | head -10
+  ! -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
+  ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" ! -path "*/.git/*" \
+  | sed 's/.*\.//' | sort | uniq -c | sort -rn | head -10
 ```
 
 ---
@@ -65,27 +67,32 @@ Empty or silent error handlers mean failures disappear without a trace. Your app
 
 ```bash
 # Python: bare except or swallowed exception
-grep -rn "except:\s*$\|except:\s*pass\|except Exception:\s*$" . --include="*.py" \
-  ! -path "*/.git/*" | head -20
+grep -rEn "except:[[:space:]]*$|except:[[:space:]]*pass|except Exception:[[:space:]]*$" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # JavaScript / TypeScript: empty catch blocks
-grep -rn "catch\s*([^)]*)\s*{\s*}" . --include="*.js" --include="*.ts" --include="*.tsx" \
-  ! -path "*/node_modules/*" | head -20
+grep -rEn "catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}" . --include="*.js" --include="*.ts" --include="*.tsx" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Go: error ignored with blank identifier
-grep -rn ",\s*_ :=\|_ = err\b" . --include="*.go" | head -20
+grep -rEn ",[[:space:]]*_ :=|_ = err\b" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Ruby: empty rescue or rescue returning nil
-grep -rn "rescue\s*=>\s*nil\|rescue\s*$" . --include="*.rb" | head -20
+grep -rEn "rescue[[:space:]]*=>[[:space:]]*nil|rescue[[:space:]]*$" . --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Java: empty catch block
-grep -rn "catch\s*(.*)\s*{\s*}" . --include="*.java" | head -20
+grep -rEn "catch[[:space:]]*\(.*\)[[:space:]]*\{[[:space:]]*\}" . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # PHP: @ error-suppression operator
-grep -rn "@\$\|@[a-z_]" . --include="*.php" | head -20
+grep -rEn "@\$|@[a-z_]" . --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Rust: unwrap without context (panics in production)
-grep -rn "\.unwrap()" . --include="*.rs" | head -20
+grep -rn "\.unwrap()" . --include="*.rs" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 ---
@@ -96,20 +103,24 @@ Accessing a value that does not exist causes an immediate crash in most language
 
 ```bash
 # JavaScript / TypeScript: property access without optional chaining
-grep -rn "req\.body\.\|req\.params\.\|req\.query\." . --include="*.js" --include="*.ts" \
-  ! -path "*/node_modules/*" | grep -v "?\." | head -20
+grep -rEn "req\.body\.|req\.params\.|req\.query\." . --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "?\." | head -20
 
 # Python: method call on result that may be None
-grep -rn "\.get(\|\.find(\|\.first(" . --include="*.py" | head -20
+grep -rEn "\.get\(|\.find\(|\.first\(" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Go: pointer dereferenced without nil check
-grep -rn "\*[a-zA-Z][a-zA-Z0-9_]*\." . --include="*.go" | head -20
+grep -rn "\*[a-zA-Z][a-zA-Z0-9_]*\." . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Ruby: chained call on result that may be nil (missing safe navigator)
-grep -rn "\.first\.\|\.last\.\|\.find\." . --include="*.rb" | grep -v "&\." | head -20
+grep -rEn "\.first\.|\.last\.|\.find\." . --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "&\." | head -20
 
 # Java: return value used directly without null check
-grep -rn "\.get(\|\.find(" . --include="*.java" | grep -v "Optional\|!= null\|== null" | head -20
+grep -rEn "\.get\(|\.find\(" . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "Optional|!= null|== null" | head -20
 ```
 
 ---
@@ -120,20 +131,26 @@ When two parts of the code run at the same time and share data without coordinat
 
 ```bash
 # Python: shared global state in threaded code
-grep -rn "global\s\+[a-zA-Z_]" . --include="*.py" | head -20
-grep -rn "threading\.\|Thread(" . --include="*.py" | head -10
+grep -rEn "global[[:space:]]+[a-zA-Z_]" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "threading\.|Thread\(" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # JavaScript / TypeScript: check-then-act on shared state
-grep -rn "if.*hasOwnProperty\|if.*\[.*\] ===" . --include="*.js" --include="*.ts" \
-  ! -path "*/node_modules/*" | head -20
+grep -rEn "if.*hasOwnProperty|if.*\[.*\] ===" . --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Go: goroutine with shared variable and no mutex
-grep -rn "go func\|go [a-zA-Z_][a-zA-Z0-9_]*(" . --include="*.go" | head -20
-grep -rn "sync\.Mutex\|sync\.RWMutex\|atomic\." . --include="*.go" | head -10
+grep -rEn "go func|go [a-zA-Z_][a-zA-Z0-9_]*\(" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "sync\.Mutex|sync\.RWMutex|atomic\." . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Java: non-synchronized access to shared field
-grep -rn "new Thread\|Runnable\|ExecutorService" . --include="*.java" | head -20
-grep -rn "synchronized\|AtomicInteger\|volatile\b" . --include="*.java" | head -10
+grep -rEn "new Thread|Runnable|ExecutorService" . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "synchronized|AtomicInteger|volatile\b" . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ---
@@ -144,28 +161,35 @@ Files, database connections, and network sockets must always be explicitly close
 
 ```bash
 # Python: file opened without context manager
-grep -rn "open(" . --include="*.py" | grep -v "with open\|#" | head -20
+grep -rn "open(" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "with open\|#" | head -20
 
 # JavaScript / TypeScript: event listener added but never removed
 grep -rn "addEventListener" . --include="*.js" --include="*.ts" --include="*.tsx" \
-  ! -path "*/node_modules/*" | head -20
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 grep -rn "removeEventListener" . --include="*.js" --include="*.ts" --include="*.tsx" \
-  ! -path "*/node_modules/*" | head -10
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Go: file or connection opened without defer close
-grep -rn "os\.Open\|sql\.Open\|net\.Dial" . --include="*.go" | head -20
-grep -rn "defer.*\.Close()" . --include="*.go" | head -10
+grep -rEn "os\.Open|sql\.Open|net\.Dial" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rn "defer.*\.Close()" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Java: stream or connection without try-with-resources
-grep -rn "new FileInputStream\|new FileOutputStream\|DriverManager\.getConnection" \
-  . --include="*.java" | head -20
+grep -rEn "new FileInputStream|new FileOutputStream|DriverManager\.getConnection" \
+  . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Ruby: file opened without block form (no automatic close)
-grep -rn "File\.open\|IO\.open" . --include="*.rb" | grep -v "do\s*|" | head -20
+grep -rEn "File\.open|IO\.open" . --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "do[[:space:]]*|" | head -20
 
 # PHP: database connection opened but not closed
-grep -rn "mysqli_connect\|new PDO\|pg_connect" . --include="*.php" | head -20
-grep -rn "mysqli_close\|->close()" . --include="*.php" | head -10
+grep -rEn "mysqli_connect|new PDO|pg_connect" . --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "mysqli_close|->close\(\)" . --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ---
@@ -176,23 +200,28 @@ Subtle mistakes in counting, boundary checks, or type assumptions that produce w
 
 ```bash
 # Off-by-one: array indexed by its own length (should be length - 1)
-grep -rn "\[.*\.length\]\|\[.*\.size()\]" . --include="*.js" --include="*.ts" \
-  --include="*.java" ! -path "*/node_modules/*" | head -20
+grep -rEn "\[.*\.length\]|\[.*\.size\(\)\]" . --include="*.js" --include="*.ts" \
+  --include="*.java" --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Python: mutable default argument (shared state across all calls)
-grep -rn "def .*=\s*\[\|def .*=\s*{" . --include="*.py" | head -20
+grep -rEn "def .*=[[:space:]]*\[|def .*=[[:space:]]*\{" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # JavaScript: loose equality causing type coercion surprises
-grep -rn "[^=!]==[^=]\|[^!]!=[^=]" . --include="*.js" ! -path "*/node_modules/*" | head -20
+grep -rEn "[^=!]==[^=]|[^!]!=[^=]" . --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Python: integer division accidentally discarding fractional part
-grep -rn "[0-9]\s*\/\/\s*[0-9]" . --include="*.py" | head -10
+grep -rEn "[0-9][[:space:]]*//[[:space:]]*[0-9]" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Go: incorrect slice range (exclusive upper bound confusion)
-grep -rn "\[.*:.*+\s*1\]" . --include="*.go" | head -10
+grep -rEn "\[.*:.*\+[[:space:]]*1\]" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # PHP: loose comparison with == instead of === (0 == "foo" is true)
-grep -rn "[^=!]==[^=]\|[^!]!=[^=]" . --include="*.php" | head -20
+grep -rEn "[^=!]==[^=]|[^!]!=[^=]" . --include="*.php" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 ---
@@ -203,23 +232,29 @@ In modern applications, many tasks run simultaneously. Missing an `await` or not
 
 ```bash
 # JavaScript / TypeScript: .then() without .catch()
-grep -rn "\.then(" . --include="*.js" --include="*.ts" ! -path "*/node_modules/*" \
+grep -rn "\.then(" . --include="*.js" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git \
   | grep -v "\.catch(" | head -20
 
 # Floating promise — async call result discarded
-grep -rn "^\s*[a-zA-Z_][a-zA-Z0-9_.]*(" . --include="*.ts" \
+grep -rEn "^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_.]*\(" . --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git \
   | grep -v "await\|return\|=\|//" | head -20
 
 # Python: coroutine created but not awaited
-grep -rn "async def " . --include="*.py" | head -10
+grep -rn "async def " . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Go: goroutine started with no cancellation mechanism
-grep -rn "go func()\|go [a-zA-Z_][a-zA-Z0-9_]*(" . --include="*.go" | head -20
-grep -rn "context\.WithCancel\|context\.WithTimeout\|context\.WithDeadline" \
-  . --include="*.go" | head -10
+grep -rEn "go func\(\)|go [a-zA-Z_][a-zA-Z0-9_]*\(" . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "context\.WithCancel|context\.WithTimeout|context\.WithDeadline" \
+  . --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Java: Future submitted but result never retrieved or checked
-grep -rn "\.submit(\|\.execute(" . --include="*.java" | grep -v "\.get(\|\.cancel(" | head -20
+grep -rEn "\.submit\(|\.execute\(" . --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "\.get(\|\.cancel(" | head -20
 ```
 
 ---

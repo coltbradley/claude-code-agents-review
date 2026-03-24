@@ -72,45 +72,45 @@ infrastructure-auditor is the ONLY agent that checks:
 ```bash
 ls .env .env.local .env.production .env.example .env.sample 2>/dev/null
 # Hardcoded environment-specific values in config files
-grep -rn "localhost\|127.0.0.1\|staging\|production" --include="*.yaml" --include="*.yml" --include="*.json" --include="*.toml" . | grep -v ".git\|node_modules\|test\|spec" | head -20
+grep -rEn "localhost|127.0.0.1|staging|production" --include="*.yaml" --include="*.yml" --include="*.json" --include="*.toml" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "test\|spec" | head -20
 ```
 
 **2. Debug Mode and Error Exposure**
 ```bash
-grep -rn "DEBUG\s*=\s*true\|debug.*=.*true\|NODE_ENV.*development" --include="*.yaml" --include="*.yml" --include="*.toml" --include="*.env*" . | grep -v ".git\|test\|spec" | head -10
-grep -rn "SHOW_ERRORS\|display_errors\s*=\s*On\|stack_trace" --include="*.yaml" --include="*.yml" --include="*.toml" . | head -10
+grep -rEn "DEBUG[[:space:]]*=[[:space:]]*true|debug.*=.*true|NODE_ENV.*development" --include="*.yaml" --include="*.yml" --include="*.toml" --include="*.env*" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "test\|spec" | head -10
+grep -rEn "SHOW_ERRORS|display_errors[[:space:]]*=[[:space:]]*On|stack_trace" --include="*.yaml" --include="*.yml" --include="*.toml" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 **3. Health Checks**
 ```bash
-grep -rn "healthcheck\|health_check\|/health\|/ping\|/ready\|/live" --include="*.yaml" --include="*.yml" --include="Dockerfile" . | head -20
+grep -rEn "healthcheck|health_check|/health|/ping|/ready|/live" --include="*.yaml" --include="*.yml" --include="Dockerfile" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 **4. CORS Configuration**
 ```bash
-grep -rn "CORS\|cors\|Access-Control-Allow-Origin" --include="*.yaml" --include="*.yml" --include="*.json" --include="*.toml" --include="*.conf" . | grep -v ".git\|node_modules" | head -20
-grep -rn "allowOrigins\|allowed_origins\|\*" --include="*.yaml" --include="*.yml" . | grep -i "cors\|origin" | head -10
+grep -rEn "CORS|cors|Access-Control-Allow-Origin" --include="*.yaml" --include="*.yml" --include="*.json" --include="*.toml" --include="*.conf" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
+grep -rEn "allowOrigins|allowed_origins|\*" --include="*.yaml" --include="*.yml" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -i "cors\|origin" | head -10
 ```
 
 **5. Container Configuration**
 ```bash
 cat Dockerfile 2>/dev/null | head -60
-grep -n "USER\|root\|FROM\|COPY\|ADD\|ENV\|SECRET\|PASSWORD" Dockerfile 2>/dev/null | head -20
-cat docker-compose*.yml 2>/dev/null | grep -n "secret\|password\|token\|privileged\|root" | head -10
+grep -En "USER|root|FROM|COPY|ADD|ENV|SECRET|PASSWORD" Dockerfile 2>/dev/null | head -20
+cat docker-compose*.yml 2>/dev/null | grep -En "secret|password|token|privileged|root" | head -10
 ```
 
 **6. CI/CD Pipeline**
 ```bash
 ls .github/workflows/*.yml .gitlab-ci.yml .circleci/config.yml Jenkinsfile 2>/dev/null
 # Does the pipeline run tests?
-grep -rn "test\|pytest\|jest\|rspec\|go test" .github/workflows/ .gitlab-ci.yml 2>/dev/null | head -10
+grep -rEn "test|pytest|jest|rspec|go test" .github/workflows/ .gitlab-ci.yml 2>/dev/null | head -10
 # Does it block on failure?
-grep -rn "continue-on-error\|allow_failure" .github/workflows/ .gitlab-ci.yml 2>/dev/null | head -10
+grep -rEn "continue-on-error|allow_failure" .github/workflows/ .gitlab-ci.yml 2>/dev/null | head -10
 ```
 
 **7. SSL/TLS**
 ```bash
-grep -rn "ssl\|tls\|https\|http://" --include="*.yaml" --include="*.yml" --include="*.toml" --include="*.conf" . | grep -v ".git\|node_modules\|test\|comment\|#" | head -20
+grep -rEn "ssl|tls|https|http://" --include="*.yaml" --include="*.yml" --include="*.toml" --include="*.conf" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "test\|comment\|#" | head -20
 ```
 
 ## Layered Output Format

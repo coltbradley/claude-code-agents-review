@@ -68,14 +68,21 @@ skipped_checks: []
 Run these before checks. If all return empty, set `status: SKIPPED`.
 
 ```bash
-grep -rn "prisma\|sequelize\|typeorm\|knex\|drizzle\|sqlalchemy\|django\.db\|ActiveRecord\|gorm\|Eloquent\|Hibernate\|@Entity" . \
+grep -rEn "prisma|sequelize|typeorm|knex|drizzle|sqlalchemy|django\.db|ActiveRecord|gorm|Eloquent|Hibernate|@Entity" . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" --include="*.go" --include="*.php" --include="*.java" | head -5
+  --include="*.rb" --include="*.go" --include="*.php" --include="*.java" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -5
 
 find . -not -path "*/node_modules/*" -not -path "*/.git/*" \
+  ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
+  ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" \
   \( -name "*.sql" -o -name "schema.prisma" -o -name "schema.rb" \) | head -5
 
-find . -not -path "*/node_modules/*" -type d -name "migrations" | head -3
+find . -not -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" \
+  ! -path "*/__pycache__/*" ! -path "*/dist/*" ! -path "*/build/*" \
+  ! -path "*/vendor/*" -type d -name "migrations" | head -3
 ```
 
 ## Checks
@@ -84,45 +91,70 @@ find . -not -path "*/node_modules/*" -type d -name "migrations" | head -3
 
 ```bash
 # DB calls inside loops (JS/TS/Python/Ruby)
-grep -rn "for\b\|forEach\|\.map\b\|\.each\b\|while\b" . \
+grep -rEn "for\b|forEach|\.map\b|\.each\b|while\b" . \
   --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
   -A 5 | grep -E "\.(find|findOne|findMany|findAll|get|query|filter|objects)\b" | head -20
 
 # Missing eager loading keywords
-grep -rn "include\b\|eager_load\|preload\|joinedload\|selectinload\|with\b" . \
-  --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" | head -10
+grep -rEn "include\b|eager_load|preload|joinedload|selectinload|with\b" . \
+  --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 2. Missing Indexes
 
 ```bash
 # Queries filtering on columns — compare against schema index declarations
-grep -rn "where.*=\|filter_by\|WHERE " . \
+grep -rEn "where.*=|filter_by|WHERE " . \
   --include="*.js" --include="*.ts" --include="*.py" \
-  --include="*.rb" --include="*.sql" | grep -v "id\b\|primary" | head -15
+  --include="*.rb" --include="*.sql" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -vE "id\b|primary" | head -15
 
-grep -rn "@@index\|add_index\|CREATE INDEX\|Index\b" . \
-  --include="*.prisma" --include="*.rb" --include="*.sql" --include="*.py" | head -10
+grep -rEn "@@index|add_index|CREATE INDEX|Index\b" . \
+  --include="*.prisma" --include="*.rb" --include="*.sql" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Foreign keys without indexes
-grep -rn "ForeignKey\|references\b\|belongsTo\|foreign_key" . \
-  --include="*.py" --include="*.rb" --include="*.ts" --include="*.sql" | head -10
+grep -rEn "ForeignKey|references\b|belongsTo|foreign_key" . \
+  --include="*.py" --include="*.rb" --include="*.ts" --include="*.sql" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 ```
 
 ### 3. Schema Issues
 
 ```bash
 # Missing NOT NULL constraints
-grep -rn "nullable.*true\|null=True\|\.optional()\b" . \
-  --include="*.prisma" --include="*.py" --include="*.rb" --include="*.ts" | head -10
+grep -rEn "nullable.*true|null=True|\.optional\(\)\b" . \
+  --include="*.prisma" --include="*.py" --include="*.rb" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Missing timestamps
-grep -rn "createdAt\|updatedAt\|created_at\|updated_at\|timestamps\b" . \
-  --include="*.prisma" --include="*.py" --include="*.rb" --include="*.sql" | head -10
+grep -rEn "createdAt|updatedAt|created_at|updated_at|timestamps\b" . \
+  --include="*.prisma" --include="*.py" --include="*.rb" --include="*.sql" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Missing unique constraint on email/username
-grep -rn "email\|username" . \
+grep -rEn "email|username" . \
   --include="*.prisma" --include="*.py" --include="*.rb" --include="*.sql" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
   | grep -v "unique\|Unique\|@@unique" | head -10
 ```
 
@@ -130,12 +162,18 @@ grep -rn "email\|username" . \
 
 ```bash
 # Destructive operations
-grep -rn "drop_table\|DROP TABLE\|remove_column\|DROP COLUMN\|TRUNCATE\|truncate\b" . \
-  --include="*.rb" --include="*.sql" --include="*.py" --include="*.ts" | head -10
+grep -rEn "drop_table|DROP TABLE|remove_column|DROP COLUMN|TRUNCATE|truncate\b" . \
+  --include="*.rb" --include="*.sql" --include="*.py" --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Column type changes and NOT NULL without default
-grep -rn "change_column\|ALTER COLUMN\|alterColumn\|NOT NULL\|null: false" . \
+grep -rEn "change_column|ALTER COLUMN|alterColumn|NOT NULL|null: false" . \
   --include="*.rb" --include="*.sql" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
   | grep -v "default\|DEFAULT" | head -10
 ```
 
@@ -143,18 +181,27 @@ grep -rn "change_column\|ALTER COLUMN\|alterColumn\|NOT NULL\|null: false" . \
 
 ```bash
 # Missing pool configuration
-grep -rn "pool\|poolSize\|pool_size\|maxConnections\|connectionLimit" . \
-  --include="*.js" --include="*.ts" --include="*.py" --include="*.go" | head -10
+grep -rEn "pool|poolSize|pool_size|maxConnections|connectionLimit" . \
+  --include="*.js" --include="*.ts" --include="*.py" --include="*.go" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Connections opened without close/release
-grep -rn "getConnection\|createConnection\|connect()\b" . \
+grep -rEn "getConnection|createConnection|connect\(\)\b" . \
   --include="*.js" --include="*.ts" --include="*.py" --include="*.go" \
-  | grep -v "disconnect\|close\|release\|with\b\|defer\b" | head -10
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -vE "disconnect|close|release|with\b|defer\b" | head -10
 
 # Multi-write operations without a transaction
-grep -rn "create\b\|update\b\|delete\b\|save\b" . \
+grep -rEn "create\b|update\b|delete\b|save\b" . \
   --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" \
-  | grep -v "transaction\|atomic\|BEGIN\|\$transaction" | head -15
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv \
+  --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build \
+  --exclude-dir=vendor --exclude-dir=.git \
+  | grep -vE "transaction|atomic|BEGIN|\\\$transaction" | head -15
 ```
 
 ## Output

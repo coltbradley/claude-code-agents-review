@@ -54,87 +54,112 @@ skipped_checks: []
 
 ```bash
 # Functions with near-identical names (copy-paste variants)
-grep -rn "function\s\+\w*[Cc]opy\|function\s\+\w*[Cc]lone\|function\s\+\w*[Dd]uplicate" . --include="*.ts" --include="*.js" --include="*.py" | head -10
+grep -rEn "function[[:space:]]+[a-zA-Z0-9_]*[Cc]opy|function[[:space:]]+[a-zA-Z0-9_]*[Cc]lone|function[[:space:]]+[a-zA-Z0-9_]*[Dd]uplicate" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Repeated string literals (magic strings copied instead of extracted)
-grep -rh "\"[^\"]\{20,\}\"" . --include="*.ts" --include="*.js" --include="*.py" | sort | uniq -d | head -10
+grep -rEh "\"[^\"]{20,}\"" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | sort | uniq -d | head -10
 
 # Similar function signatures (same params in different files)
-grep -rn "function\s\+\w\+\s*(.*req.*res\|.*ctx.*next\|.*event.*context)" . --include="*.ts" --include="*.js" | head -20
+grep -rEn "function[[:space:]]+[a-zA-Z0-9_]+[[:space:]]*\(.*req.*res|.*ctx.*next|.*event.*context\)" . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 ```
 
 ## 2. Complexity
 
 ```bash
 # Files over 300 lines (god file candidates)
-find . -name "*.ts" -o -name "*.js" -o -name "*.py" | grep -v node_modules | grep -v ".git" | xargs wc -l 2>/dev/null | sort -rn | head -20
+find . \( -name "*.ts" -o -name "*.js" -o -name "*.py" \) \
+  ! -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" ! -path "*/__pycache__/*" \
+  ! -path "*/dist/*" ! -path "*/build/*" ! -path "*/vendor/*" ! -path "*/.git/*" \
+  | xargs wc -l 2>/dev/null | sort -rn | head -20
 
 # Deep nesting (4+ levels of indentation as proxy)
-grep -rn "^\s\{16,\}" . --include="*.ts" --include="*.js" --include="*.py" | grep -v "node_modules\|.git" | head -20
+grep -rEn "^[[:space:]]{16,}" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Long functions: look for functions with many blank-line-separated blocks
-grep -rn "^def \|^function \|^const.*=.*=>" . --include="*.py" --include="*.ts" --include="*.js" | grep -v "node_modules\|.git" | head -30
+grep -rEn "^def |^function |^const.*=.*=>" . --include="*.py" --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -30
 ```
 
 ## 3. Naming Consistency
 
 ```bash
 # camelCase and snake_case mixed in same file (Python files with camelCase)
-grep -rln "[a-z][A-Z]" . --include="*.py" | grep -v "node_modules\|.git" | head -10
+grep -rln "[a-z][A-Z]" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # TypeScript/JS files with snake_case variables
-grep -rn "const [a-z]\+_[a-z]\|let [a-z]\+_[a-z]\|var [a-z]\+_[a-z]" . --include="*.ts" --include="*.tsx" --include="*.js" | grep -v "node_modules\|.git" | head -10
+grep -rEn "const [a-z]+_[a-z]|let [a-z]+_[a-z]|var [a-z]+_[a-z]" . --include="*.ts" --include="*.tsx" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Inconsistent boolean prefixes (is/has/should mixed with plain names)
-grep -rn "const [a-z]\+[A-Z]\|let [a-z]\+[A-Z]" . --include="*.ts" --include="*.js" | grep -v "is[A-Z]\|has[A-Z]\|should[A-Z]\|can[A-Z]\|node_modules\|.git" | head -10
+grep -rEn "const [a-z]+[A-Z]|let [a-z]+[A-Z]" . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -Ev "is[A-Z]|has[A-Z]|should[A-Z]|can[A-Z]" | head -10
 ```
 
 ## 4. Dead Code
 
 ```bash
 # Commented-out code blocks (not prose comments)
-grep -rn "^\s*//.*[;{}]\|^\s*#.*[;{}]\|^\s*/\*" . --include="*.ts" --include="*.js" --include="*.py" | grep -v "node_modules\|.git" | head -20
+grep -rEn "^[[:space:]]*//.*(;|\{|\})|^[[:space:]]*#.*(;|\{|\})|^[[:space:]]*/\*" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # TODO/FIXME/HACK markers (lingering intent signals)
-grep -rn "TODO\|FIXME\|HACK\|XXX\|TEMP\|NOCOMMIT" . --include="*.ts" --include="*.js" --include="*.py" | grep -v "node_modules\|.git" | head -20
+grep -rEn "TODO|FIXME|HACK|XXX|TEMP|NOCOMMIT" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Exported but never imported symbols (cross-file dead exports)
-grep -rn "^export\s\+\(function\|const\|class\|type\|interface\)" . --include="*.ts" | grep -v "node_modules\|.git" | head -20
+grep -rEn "^export[[:space:]]+(function|const|class|type|interface)" . --include="*.ts" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -20
 
 # Unreachable code after return/throw
-grep -rn "return\s*$\|return [^;]*;\s*$" -A 1 . --include="*.ts" --include="*.js" | grep -v "node_modules\|.git\|^--$" | head -20
+grep -rEn "return[[:space:]]*$|return [^;]*;[[:space:]]*$" -A 1 . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -v "^--$" | head -20
 ```
 
 ## 5. Structural Issues
 
 ```bash
 # Circular import hints (A imports B which imports A)
-grep -rn "^import\|^from\|^require(" . --include="*.ts" --include="*.js" --include="*.py" | grep -v "node_modules\|.git" | head -40
+grep -rEn "^import|^from|^require\(" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -40
 
 # Single files doing too many things (many class/function definitions)
-grep -rn "^class \|^def \|^function \|^const.*= (" . --include="*.py" --include="*.ts" --include="*.js" | grep -v "node_modules\|.git" | cut -d: -f1 | sort | uniq -c | sort -rn | head -10
+grep -rEn "^class |^def |^function |^const.*= \(" . --include="*.py" --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | cut -d: -f1 | sort | uniq -c | sort -rn | head -10
 
 # Missing abstraction: raw fetch/http calls scattered outside a client module
-grep -rn "fetch(\|axios\.\|http\.get\|http\.post" . --include="*.ts" --include="*.js" | grep -v "node_modules\|.git\|client\|api\|service" | head -10
+grep -rEn "fetch\(|axios\.|http\.get|http\.post" . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | grep -Ev "client|api|service" | head -10
 ```
 
 ## 6. AI-Specific Code Smells
 
 ```bash
 # Type-defeating patterns
-grep -rn ": any\b\|as any\b" . --include="*.ts" --include="*.tsx" | grep -v "node_modules\|.git" | head -15
-grep -rn "# type: ignore\|# noqa" . --include="*.py" | grep -v "node_modules\|.git" | head -10
-grep -rn "\.unwrap()\|\.expect(" . --include="*.rs" | grep -v "node_modules\|.git" | head -10
+grep -rEn ": any\b|as any\b" . --include="*.ts" --include="*.tsx" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -15
+grep -rEn "# type: ignore|# noqa" . --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
+grep -rEn "\.unwrap\(\)|\.expect\(" . --include="*.rs" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -10
 
 # Excessive inline comments that restate the code
-grep -rn "//.*increment\|//.*add one\|//.*return\|//.*loop\|//.*check if\|//.*assign\|# increment\|# add one\|# return\|# loop\|# check if\|# assign" . --include="*.ts" --include="*.js" --include="*.py" | grep -v "node_modules\|.git" | head -15
+grep -rEn "//.*increment|//.*add one|//.*return|//.*loop|//.*check if|//.*assign|# increment|# add one|# return|# loop|# check if|# assign" . --include="*.ts" --include="*.js" --include="*.py" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -15
 
 # Heavyweight imports for trivial tasks
-grep -rn "^import lodash\|from 'lodash'\|require('lodash')" . --include="*.ts" --include="*.js" | grep -v "node_modules\|.git" | head -5
-grep -rn "^import moment\|from 'moment'" . --include="*.ts" --include="*.js" | grep -v "node_modules\|.git" | head -5
+grep -rEn "^import lodash|from 'lodash'|require\('lodash'\)" . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -5
+grep -rEn "^import moment|from 'moment'" . --include="*.ts" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -5
 
 # Copy-paste with slight variation (duplicate variable name prefixes)
-grep -rn "handle[A-Z]\w\+\s*=" . --include="*.ts" --include="*.tsx" --include="*.js" | grep -v "node_modules\|.git" | cut -d: -f1 | sort | uniq -c | sort -rn | head -10
+grep -rEn "handle[A-Z][a-zA-Z0-9_]+[[:space:]]*=" . --include="*.ts" --include="*.tsx" --include="*.js" \
+  --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | cut -d: -f1 | sort | uniq -c | sort -rn | head -10
 ```
 
 ## Output

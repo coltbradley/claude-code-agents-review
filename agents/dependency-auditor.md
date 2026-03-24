@@ -80,14 +80,14 @@ pip list --outdated 2>/dev/null | head -30
 ```bash
 # Check if listed packages are actually imported anywhere in source
 # For each dep in the manifest, grep source files for imports/requires
-grep -rn "import\|require\|from\|use " --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" --include="*.go" . | head -50
+grep -rEn "import|require|from|use " --include="*.js" --include="*.ts" --include="*.py" --include="*.rb" --include="*.go" . --exclude-dir=node_modules --exclude-dir=venv --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=dist --exclude-dir=build --exclude-dir=vendor --exclude-dir=.git | head -50
 ```
 
 **4. License Conflicts**
 ```bash
 # Look for GPL/AGPL in commercial projects
-npm ls --json 2>/dev/null | grep -i "license" | grep -i "gpl\|agpl" | head -20
-cat requirements.txt 2>/dev/null | xargs pip show 2>/dev/null | grep -i "license" | grep -i "gpl\|agpl" | head -20
+npm ls --json 2>/dev/null | grep -i "license" | grep -iE "gpl|agpl" | head -20
+cat requirements.txt 2>/dev/null | xargs pip show 2>/dev/null | grep -i "license" | grep -iE "gpl|agpl" | head -20
 ```
 
 **5. Supply Chain Risk**
