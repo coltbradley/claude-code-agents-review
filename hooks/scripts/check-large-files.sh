@@ -4,16 +4,11 @@
 
 MAX_BYTES=512000  # 500KB in bytes
 
-STAGED_FILES=$(git diff --cached --name-only 2>/dev/null)
-
-if [ -z "$STAGED_FILES" ]; then
-  exit 0
-fi
-
 BLOCKED=0
-BLOCKED_FILES=()
+BLOCKED_FILES=""
 
-for FILE in $STAGED_FILES; do
+# Null-delimited iteration handles filenames with spaces
+while IFS= read -r -d '' FILE; do
   [ -f "$FILE" ] || continue
 
   FILE_SIZE=$(wc -c < "$FILE" 2>/dev/null)
@@ -21,18 +16,16 @@ for FILE in $STAGED_FILES; do
   if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt "$MAX_BYTES" ]; then
     SIZE_KB=$(( FILE_SIZE / 1024 ))
     BLOCKED=1
-    BLOCKED_FILES+=("  $FILE  (${SIZE_KB}KB)")
+    BLOCKED_FILES="$BLOCKED_FILES  $FILE  (${SIZE_KB}KB)\n"
   fi
-done
+done < <(git diff --cached --name-only -z 2>/dev/null)
 
 if [ "$BLOCKED" -eq 1 ]; then
   echo ""
   echo "BLOCKED: One or more staged files exceed the 500KB size limit."
   echo ""
   echo "Oversized files:"
-  for F in "${BLOCKED_FILES[@]}"; do
-    echo "$F"
-  done
+  printf "%b" "$BLOCKED_FILES"
   echo ""
   echo "Guidance:"
   echo "  - For large binary assets (images, models, datasets), use Git LFS:"
