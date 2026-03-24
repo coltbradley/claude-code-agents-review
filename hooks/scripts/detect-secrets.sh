@@ -33,18 +33,18 @@ while IFS= read -r -d '' FILE; do
 done < <(git diff --cached --name-only -z 2>/dev/null)
 
 if [ "$FOUND" -eq 1 ]; then
-  echo ""
-  echo "BLOCKED: Potential secrets detected in staged files."
-  echo ""
-  echo "Flagged locations:"
-  printf "%b" "$FINDINGS"
-  echo ""
-  echo "Guidance:"
-  echo "  - Remove secrets from source files before committing."
-  echo "  - Use environment variables or a secrets manager instead."
-  echo "  - If this is a false positive, add the file to .gitignore"
-  echo "    or use a .env.example file with placeholder values."
-  echo ""
+  echo "" >&2
+  echo "BLOCKED: Potential secrets detected in staged files." >&2
+  echo "" >&2
+  echo "Flagged locations:" >&2
+  printf "%b" "$FINDINGS" >&2
+  echo "" >&2
+  echo "Guidance:" >&2
+  echo "  - Remove secrets from source files before committing." >&2
+  echo "  - Use environment variables or a secrets manager instead." >&2
+  echo "  - If this is a false positive, add the file to .gitignore" >&2
+  echo "    or use a .env.example file with placeholder values." >&2
+  echo "" >&2
   exit 2
 fi
 
