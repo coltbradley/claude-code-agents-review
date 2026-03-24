@@ -129,6 +129,39 @@ Code Guardian pairs naturally with the superpowers plugin. Superpowers gives you
 
 ---
 
+## Troubleshooting
+
+**Plugin not loading:**
+- Verify the plugin directory is correct: `claude --plugin-dir ./code-guardian`
+- Check that `.claude-plugin/plugin.json` exists and is valid JSON
+- Try `/reload-plugins` to force a refresh
+
+**Hooks not triggering:**
+- Hooks are configured in `.claude/settings.json` — verify the `hooks` section exists
+- Check that hook scripts are executable: `chmod +x hooks/scripts/*.sh`
+- Run a hook manually to test: `echo '{}' | bash hooks/scripts/detect-secrets.sh`
+
+**Audit output not appearing:**
+- Reports are written to `.claude/audits/` — this directory is created automatically
+- If an auditor finds nothing, it writes a "no issues detected" report, not an empty file
+- Check the status block at the top of any report for `SKIPPED` or `ERROR` status
+
+**False positives from secret detection:**
+- Rename test files with real-looking credentials to use `.sample` or `.example` extensions
+- Move placeholder values into `.env.example` files
+- Do not use `--no-verify` — it disables all pre-commit hooks, not just secret detection
+
+---
+
+## Further Reading
+
+Design decisions and research behind Code Guardian:
+
+- [Research: Non-Programmer Code Review](docs/research-non-programmer-code-review.md) — Analysis of how non-programmers interact with AI-generated code and where guardrails are needed
+- [Research: Non-Programmer Claude Code Workflows](docs/non-programmer-claude-code-workflows.md) — Workflow patterns and risk points for the target audience
+
+---
+
 ## License
 
 MIT
